@@ -1,30 +1,38 @@
 {
   "expo": {
-    "name": "nexos-tecni-express-warehouse",
+    "name": "Tecni Express Bodega",
     "slug": "nexos-tecni-express-warehouse",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "tecni-warehouse",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nexos.tecniexpress.warehouse",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Se necesita la cámara para escanear códigos de barras de productos."
+      }
     },
     "android": {
+      "package": "com.nexos.tecniexpress.warehouse",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "permissions": ["android.permission.CAMERA"],
+      "edgeToEdgeEnabled": true
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      ["expo-camera", { "cameraPermission": "Se necesita la cámara para escanear códigos de barras." }]
+    ]
   }
 }
