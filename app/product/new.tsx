@@ -2,13 +2,18 @@ import { useState, useEffect } from 'react'
 import { 
   View, Text, StyleSheet, ScrollView, TextInput, 
   TouchableOpacity, ActivityIndicator, Alert, SafeAreaView,
-  KeyboardAvoidingView, Platform, Image
+  KeyboardAvoidingView, Platform, Image, Modal, FlatList
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { tokens } from '@/theme/tokens'
 import { InventoryService } from '@/services/inventory.service'
 import { ProductService } from '@/services/product.service'
+
+interface SelectorItem {
+  id: string
+  name: string
+}
 
 export default function NewProductScreen() {
   const router = useRouter()
@@ -18,6 +23,12 @@ export default function NewProductScreen() {
   const [brands, setBrands] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
   
+  // Modal State
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalItems, setModalItems] = useState<SelectorItem[]>([])
+  const [activeSelector, setActiveSelector] = useState<'brand' | 'category' | null>(null)
+
   // Form State
   const [form, setForm] = useState({
     name_es: '',
@@ -46,6 +57,27 @@ export default function NewProductScreen() {
     }
   }
 
+  const openSelector = (type: 'brand' | 'category') => {
+    setActiveSelector(type)
+    if (type === 'brand') {
+      setModalTitle('Seleccionar Marca')
+      setModalItems(brands.map(b => ({ id: b.id, name: b.name })))
+    } else {
+      setModalTitle('Seleccionar Categoría')
+      setModalItems(categories.map(c => ({ id: c.id, name: c.name_es || c.name })))
+    }
+    setModalVisible(true)
+  }
+
+  const handleSelect = (item: SelectorItem) => {
+    if (activeSelector === 'brand') {
+      setForm({...form, brand_id: item.id})
+    } else {
+      setForm({...form, category_id: item.id})
+    }
+    setModalVisible(false)
+  }
+
   const handleSave = async () => {
     if (!form.name_es || !form.sku || !form.base_price || !form.brand_id || !form.category_id) {
       Alert.alert('Error', 'Por favor completa todos los campos obligatorios.')
@@ -55,7 +87,6 @@ export default function NewProductScreen() {
     try {
       setLoading(true)
       
-      // 1. Create the product
       const newProduct = await ProductService.create({
         name_es: form.name_es,
         sku: form.sku,
@@ -65,9 +96,6 @@ export default function NewProductScreen() {
         description_es: form.description_es
       })
 
-      // 2. Initialize inventory (optional, usually you'd add stock separately but following image flow)
-      // Note: We need a warehouse_id for this. For now, we'll just save the product.
-      
       Alert.alert('Éxito', 'Producto creado correctamente.', [
         { text: 'OK', onPress: () => router.back() }
       ])
@@ -118,28 +146,14 @@ export default function NewProductScreen() {
             </View>
 
             <View style={styles.row}>
-              <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
+              <View style={[styles.inputGroup, { flex: 1.2, marginRight: 10 }]}>
                 <Text style={styles.label}>Categoría</Text>
-                <View style={styles.select}>
-                  <Text style={form.category_id ? styles.selectText : styles.placeholderText}>
+                <TouchableOpacity style={styles.select} onPress={() => openSelector('category')}>
+                  <Text style={form.category_id ? styles.selectText : styles.placeholderText} numberOfLines={1}>
                     {categories.find(c => c.id === form.category_id)?.name_es || 'Seleccionar'}
                   </Text>
                   <MaterialCommunityIcons name="chevron-down" size={20} color={tokens.colors.gray400} />
-                </View>
-                {/* Simplified Selector - In a real app we'd use a Modal or Picker */}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.miniPicker}>
-                  {categories.map(c => (
-                    <TouchableOpacity 
-                      key={c.id} 
-                      onPress={() => setForm({...form, category_id: c.id})}
-                      style={[styles.miniChip, form.category_id === c.id && styles.miniChipActive]}
-                    >
-                      <Text style={[styles.miniChipText, form.category_id === c.id && styles.miniChipTextActive]}>
-                        {c.name_es}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+                </TouchableOpacity>
               </View>
 
               <View style={[styles.inputGroup, { flex: 1 }]}>
@@ -156,20 +170,14 @@ export default function NewProductScreen() {
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Marca</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.miniPicker}>
-                {brands.map(b => (
-                  <TouchableOpacity 
-                    key={b.id} 
-                    onPress={() => setForm({...form, brand_id: b.id})}
-                    style={[styles.miniChip, form.brand_id === b.id && styles.miniChipActive]}
-                  >
-                    <Text style={[styles.miniChipText, form.brand_id === b.id && styles.miniChipTextActive]}>
-                      {b.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+              <TouchableOpacity style={styles.select} onPress={() => openSelector('brand')}>
+                <Text style={form.brand_id ? styles.selectText : styles.placeholderText}>
+                  {brands.find(b => b.id === form.brand_id)?.name || 'Seleccionar Marca'}
+                </Text>
+                <MaterialCommunityIcons name="chevron-down" size={20} color={tokens.colors.gray400} />
+              </TouchableOpacity>
             </View>
+
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Cantidad Inicial</Text>
@@ -233,6 +241,54 @@ export default function NewProductScreen() {
             )}
           </TouchableOpacity>
         </View>
+
+        {/* Custom Dropdown Modal */}
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <TouchableOpacity 
+            style={styles.modalOverlay} 
+            activeOpacity={1} 
+            onPress={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{modalTitle}</Text>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <MaterialCommunityIcons name="close" size={24} color={tokens.colors.gray400} />
+                </TouchableOpacity>
+              </View>
+              
+              <FlatList
+                data={modalItems}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity 
+                    style={[
+                      styles.modalItem, 
+                      (form.brand_id === item.id || form.category_id === item.id) && styles.modalItemActive
+                    ]} 
+                    onPress={() => handleSelect(item)}
+                  >
+                    <Text style={[
+                      styles.modalItemText,
+                      (form.brand_id === item.id || form.category_id === item.id) && styles.modalItemTextActive
+                    ]}>
+                      {item.name}
+                    </Text>
+                    {(form.brand_id === item.id || form.category_id === item.id) && (
+                      <MaterialCommunityIcons name="check" size={20} color={tokens.colors.primary} />
+                    )}
+                  </TouchableOpacity>
+                )}
+                contentContainerStyle={{ paddingBottom: 20 }}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -320,7 +376,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: tokens.colors.gray600,
-
     marginBottom: 8,
   },
   input: {
@@ -348,7 +403,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderWidth: 1,
     borderColor: tokens.colors.gray100,
-    marginBottom: 8,
+    minHeight: 52,
   },
   selectText: {
     fontSize: 15,
@@ -357,30 +412,6 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 15,
     color: tokens.colors.gray400,
-  },
-  miniPicker: {
-    marginTop: 4,
-  },
-  miniChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: tokens.colors.gray50,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: tokens.colors.gray100,
-  },
-  miniChipActive: {
-    backgroundColor: tokens.colors.primary + '10',
-    borderColor: tokens.colors.primary,
-  },
-  miniChipText: {
-    fontSize: 12,
-    color: tokens.colors.gray600,
-  },
-  miniChipTextActive: {
-    color: tokens.colors.primary,
-    fontWeight: '600',
   },
   stockRow: {
     flexDirection: 'row',
@@ -419,5 +450,52 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
-  }
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContainer: {
+    width: '100%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 24,
+    ...tokens.shadow.lg,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: tokens.colors.gray900,
+  },
+  modalItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.gray100,
+  },
+  modalItemActive: {
+    backgroundColor: tokens.colors.primary + '05',
+  },
+  modalItemText: {
+    fontSize: 16,
+    color: tokens.colors.gray600,
+
+  },
+  modalItemTextActive: {
+    color: tokens.colors.primary,
+  },
 })
+
