@@ -4,12 +4,12 @@
     "slug": "nexos-tecni-express-warehouse",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/site/logo_tecni_express.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "tecni-warehouse",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/site/logo_tecni_express.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -23,9 +23,10 @@
     "android": {
       "package": "com.nexos.tecniexpress.warehouse",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/site/logo_tecni_express.png",
         "backgroundColor": "#ffffff"
       },
+
       "permissions": ["android.permission.CAMERA"],
       "edgeToEdgeEnabled": true
     },
