@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { FlashList } from '@shopify/flash-list'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { InventoryRow } from '@/types/database.types'
@@ -12,42 +12,64 @@ interface Props {
   onItemPress?: (item: InventoryRow) => void
 }
 
+const BRAND_LOGOS: Record<string, any> = {
+  'Frigidaire': require('@/assets/brands/frigidaire.png'),
+  'Mabe': require('@/assets/brands/mabe.jpg'),
+  'Whirlpool': require('@/assets/brands/whirlpool.png'),
+}
+
 export const InventoryList: React.FC<Props> = ({ 
   data, 
   onRefresh, 
   refreshing,
   onItemPress 
 }) => {
-  const renderItem = ({ item }: { item: InventoryRow }) => (
-    <TouchableOpacity 
-      style={styles.card} 
-      onPress={() => onItemPress?.(item)}
-      activeOpacity={0.7}
-      accessible
-      accessibilityRole="button"
-      accessibilityLabel={`Producto ${item.products?.name_es}, SKU ${item.products?.sku}, cantidad ${item.quantity}`}
-    >
-      <View style={styles.cardHeader}>
-        <Text style={styles.productName} numberOfLines={1}>
-          {item.products?.name_es || 'Sin nombre'}
-        </Text>
-        <View style={styles.qtyBadge}>
-          <Text style={styles.qtyText}>{item.quantity}</Text>
+  const renderItem = ({ item }: { item: InventoryRow }) => {
+    const brandName = item.products?.brands?.name || ''
+    const brandLogo = BRAND_LOGOS[brandName]
+
+    return (
+      <TouchableOpacity 
+        style={styles.card} 
+        onPress={() => onItemPress?.(item)}
+        activeOpacity={0.7}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={`Producto ${item.products?.name_es}, Marca ${brandName}, SKU ${item.products?.sku}, cantidad ${item.quantity}`}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.titleWrapper}>
+            <Text style={styles.productName} numberOfLines={1}>
+              {item.products?.name_es || 'Sin nombre'}
+            </Text>
+            {brandName ? (
+              <View style={styles.brandBadge}>
+                {brandLogo ? (
+                  <Image source={brandLogo} style={styles.brandIcon} resizeMode="contain" />
+                ) : (
+                  <Text style={styles.brandText}>{brandName}</Text>
+                )}
+              </View>
+            ) : null}
+          </View>
+          <View style={styles.qtyBadge}>
+            <Text style={styles.qtyText}>{item.quantity}</Text>
+          </View>
         </View>
-      </View>
-      
-      <View style={styles.cardFooter}>
-        <View style={styles.skuWrapper}>
-          <MaterialCommunityIcons name="barcode" size={14} color={tokens.colors.gray400} />
-          <Text style={styles.skuText}>{item.products?.sku || 'S/SKU'}</Text>
+        
+        <View style={styles.cardFooter}>
+          <View style={styles.skuWrapper}>
+            <MaterialCommunityIcons name="barcode" size={14} color={tokens.colors.gray400} />
+            <Text style={styles.skuText}>{item.products?.sku || 'S/SKU'}</Text>
+          </View>
+          <View style={styles.warehouseWrapper}>
+            <MaterialCommunityIcons name="store" size={14} color={tokens.colors.gray400} />
+            <Text style={styles.warehouseText}>{item.warehouses?.name || 'S/B'}</Text>
+          </View>
         </View>
-        <View style={styles.warehouseWrapper}>
-          <MaterialCommunityIcons name="store" size={14} color={tokens.colors.gray400} />
-          <Text style={styles.warehouseText}>{item.warehouses?.name || 'S/B'}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  )
+      </TouchableOpacity>
+    )
+  }
 
   return (
     <FlashList<InventoryRow>
@@ -78,15 +100,28 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: tokens.spacing[3],
   },
+  titleWrapper: { flex: 1, marginRight: tokens.spacing[2] },
   productName: {
     fontSize: tokens.typography.size.base,
     fontWeight: tokens.typography.weight.bold,
     color: tokens.colors.gray900,
-    flex: 1,
-    marginRight: tokens.spacing[2],
+    marginBottom: 2,
+  },
+  brandBadge: {
+    alignSelf: 'flex-start',
+  },
+  brandIcon: {
+    width: 60,
+    height: 18,
+  },
+  brandText: {
+    fontSize: tokens.typography.size.xs,
+    color: tokens.colors.gray400,
+    textTransform: 'uppercase',
+    fontWeight: tokens.typography.weight.semibold,
   },
   qtyBadge: {
     backgroundColor: tokens.colors.gray100,
@@ -133,3 +168,4 @@ const styles = StyleSheet.create({
     fontSize: tokens.typography.size.base,
   },
 })
+

@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Platform,
+  StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, 
+  Platform, Image,
 } from 'react-native'
 import { supabase } from '@/lib/supabase'
+import { tokens } from '@/theme/tokens'
 
 export default function LoginScreen() {
   const [email, setEmail]       = useState('')
@@ -17,33 +19,32 @@ export default function LoginScreen() {
     }
 
     setLoading(true)
-
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setLoading(false)
-      Alert.alert('Error de acceso', error.message)
+      Alert.alert('Error de acceso', 'Credenciales inválidas. Verifica tu correo y contraseña.')
       return
     }
 
     // Verify this user is a warehouse admin
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('is_admin, admin_role')
+      .select('role')
       .eq('id', data.user.id)
       .single()
 
-    if (profileError || !profile?.is_admin || profile.admin_role !== 'warehouse') {
+    // Assuming role 'staff' or similar has warehouse access
+    if (profileError || (profile?.role !== 'admin' && profile?.role !== 'staff')) {
       await supabase.auth.signOut()
       setLoading(false)
       Alert.alert(
         'Acceso denegado',
-        'Esta app es exclusiva para bodegueros. Verifica tus credenciales.',
+        'Esta app es exclusiva para personal autorizado de bodega.',
       )
       return
     }
 
-    // Auth state listener in _layout.tsx handles the redirect
     setLoading(false)
   }
 
@@ -53,13 +54,21 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.card}>
-        <Text style={styles.title}>Tecni Express</Text>
-        <Text style={styles.subtitle}>App Bodega</Text>
+        <View style={styles.logoWrapper}>
+          <Image 
+            source={require('@/assets/site/logo_tecni_express.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        
+        <Text style={styles.title}>Sistema de Bodega</Text>
+        <Text style={styles.subtitle}>Gestión de Inventario y Traslados</Text>
 
         <TextInput
           style={styles.input}
           placeholder="Correo electrónico"
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={tokens.colors.gray400}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -69,7 +78,7 @@ export default function LoginScreen() {
         <TextInput
           style={styles.input}
           placeholder="Contraseña"
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={tokens.colors.gray400}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -80,12 +89,17 @@ export default function LoginScreen() {
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleLogin}
           disabled={loading}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Iniciar sesión"
         >
           {loading
             ? <ActivityIndicator color="#fff" />
-            : <Text style={styles.buttonText}>Iniciar sesión</Text>}
+            : <Text style={styles.buttonText}>Iniciar Sesión</Text>}
         </TouchableOpacity>
       </View>
+      
+      <Text style={styles.footer}>© {new Date().getFullYear()} Nexos Tecni-Express</Text>
     </KeyboardAvoidingView>
   )
 }
@@ -93,55 +107,66 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: tokens.colors.bgScreen,
     justifyContent: 'center',
-    padding: 24,
+    padding: tokens.spacing[6],
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 28,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: tokens.colors.bgLight,
+    borderRadius: tokens.radius['2xl'] || 24,
+    padding: tokens.spacing[8],
+    ...tokens.shadow.lg,
+  },
+  logoWrapper: {
+    alignItems: 'center',
+    marginBottom: tokens.spacing[6],
+  },
+  logo: {
+    width: 200,
+    height: 80,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#111827',
+    fontSize: tokens.typography.size.xl,
+    fontWeight: tokens.typography.weight.bold,
+    color: tokens.colors.gray900,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 15,
-    color: '#6b7280',
+    fontSize: tokens.typography.size.base,
+    color: tokens.colors.gray600,
     textAlign: 'center',
-    marginBottom: 28,
-    marginTop: 4,
+    marginBottom: tokens.spacing[8],
+    marginTop: tokens.spacing[1],
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#111827',
-    marginBottom: 14,
-    backgroundColor: '#f9fafb',
+    borderColor: tokens.colors.gray200,
+    borderRadius: tokens.radius.lg,
+    paddingHorizontal: tokens.spacing[4],
+    paddingVertical: tokens.spacing[3],
+    fontSize: tokens.typography.size.base,
+    color: tokens.colors.gray900,
+    marginBottom: tokens.spacing[4],
+    backgroundColor: tokens.colors.gray50,
   },
   button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 10,
-    paddingVertical: 14,
+    backgroundColor: tokens.colors.primary,
+    borderRadius: tokens.radius.lg,
+    paddingVertical: tokens.spacing[4],
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: tokens.spacing[2],
   },
   buttonDisabled: { opacity: 0.6 },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: tokens.typography.size.base,
+    fontWeight: tokens.typography.weight.bold,
+  },
+  footer: {
+    textAlign: 'center',
+    marginTop: tokens.spacing[10],
+    color: tokens.colors.gray400,
+    fontSize: tokens.typography.size.xs,
   },
 })
+

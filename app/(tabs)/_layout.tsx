@@ -1,22 +1,39 @@
 import { Tabs } from 'expo-router'
+import { Image, View } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { tokens } from '@/theme/tokens'
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#2563eb',
-        tabBarInactiveTintColor: '#9ca3af',
+        tabBarActiveTintColor: tokens.colors.primary,
+        tabBarInactiveTintColor: tokens.colors.gray400,
         tabBarStyle: { 
-          borderTopColor: '#e5e7eb',
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
+          borderTopColor: tokens.colors.gray100,
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 10,
+          backgroundColor: tokens.colors.bgLight,
         },
-        headerStyle: { backgroundColor: '#fff' },
-        headerTintColor: '#111827',
+        headerStyle: { 
+          backgroundColor: tokens.colors.bgLight,
+        },
+        headerTintColor: tokens.colors.gray900,
         headerShadowVisible: false,
-        headerTitleStyle: { fontWeight: '800' },
+        headerTitleStyle: { 
+          fontWeight: tokens.typography.weight.extrabold as any,
+          fontSize: tokens.typography.size.lg,
+        },
+        headerRight: () => (
+          <View style={{ marginRight: 16 }}>
+            <Image 
+              source={require('@/assets/site/logo_tecni_express.png')}
+              style={{ width: 100, height: 30 }}
+              resizeMode="contain"
+            />
+          </View>
+        ),
       }}
     >
       <Tabs.Screen
@@ -58,4 +75,5 @@ export default function TabLayout() {
     </Tabs>
   )
 }
+
 

@@ -1,0 +1,22 @@
+# Task: CRUD Implementation for Warehouse App
+
+- [x] Setup Core Architecture
+    - [x] Generate/Define Database Types in `types/database.types.ts`
+    - [x] Create Base Supabase Service and Types
+- [x] Implement Core Entities & Use Cases
+    - [x] Products Entity & Use Cases
+    - [x] Inventory Entity & Use Cases
+    - [x] Transfers Entity & Use Cases
+- [x] Build Optimized UI Components
+    - [x] High-performance `ProductList` component (FlashList)
+    - [x] Generic `ScannerInput` for QR/Barcode
+    - [x] Reusable Form components (react-hook-form + Zod)
+- [x] Implement Feature Screens
+    - [x] Inventory List & Details
+    - [x] Warehouse Transfer Workflow
+    - [x] Inventory Count Session screens
+
+
+- [ ] Verification & Testing
+    - [ ] Unit tests for Use Cases
+    - [ ] Manual verification of Scan -> CRUD flow

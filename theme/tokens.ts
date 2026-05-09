@@ -50,8 +50,10 @@ export const tokens = {
     md: 8, 
     lg: 12, 
     xl: 16, 
+    '2xl': 24,
     full: 9999 
   },
+
 
   shadow: {
     sm: { shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4,  elevation: 2 },

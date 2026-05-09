@@ -8,7 +8,7 @@ export class InventoryService {
   static async getAll(): Promise<InventoryRow[]> {
     const { data, error } = await supabase
       .from('inventory')
-      .select('*, products(*), warehouses(*)')
+      .select('*, products(*, brands(*)), warehouses(*)')
       .order('quantity', { ascending: true })
 
     if (error) throw error
@@ -21,9 +21,10 @@ export class InventoryService {
   static async getByWarehouse(warehouseId: string, search?: string): Promise<InventoryRow[]> {
     let query = supabase
       .from('inventory')
-      .select('*, products(*), warehouses(*)')
+      .select('*, products(*, brands(*)), warehouses(*)')
       .eq('warehouse_id', warehouseId)
       .order('quantity', { ascending: true })
+
 
     const { data, error } = await query
     if (error) throw error

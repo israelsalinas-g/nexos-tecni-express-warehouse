@@ -1,0 +1,71 @@
+# Implementation Plan: Warehouse App CRUD & Core Features
+
+This plan outlines the development of CRUD operations for the tables defined in `docs/schema.md`, applying Clean Architecture principles and mobile development best practices (Expo, FlashList, Performance optimization).
+
+## User Review Required
+
+> [!IMPORTANT]
+> The schema defined in `docs/schema.md` is quite extensive. We will prioritize core warehouse operations (Inventory, Products, Transfers, Counts) first. Please confirm if there is a specific priority list.
+
+> [!WARNING]
+> We will use **Zod** for schema validation on the client side to ensure data integrity before sending it to Supabase.
+
+## Proposed Changes
+
+### 🏗️ Architecture Layering (Clean Architecture)
+
+We will follow the separation of concerns as per global rules:
+
+#### [NEW] [types/database.types.ts](file:///c:/Users/user/Downloads/TrainingAI/nexos-tecni-express-warehouse/types/database.types.ts)
+- Generate/Define TypeScript interfaces for all entities (`Product`, `Inventory`, `Warehouse`, `Order`, etc.).
+
+#### [NEW] [core/entities/](file:///c:/Users/user/Downloads/TrainingAI/nexos-tecni-express-warehouse/core/entities/)
+- Pure business logic and domain types.
+
+#### [NEW] [core/use-cases/](file:///c:/Users/user/Downloads/TrainingAI/nexos-tecni-express-warehouse/core/use-cases/)
+- Application logic (e.g., `TransferInventoryUseCase`, `RecordCountUseCase`).
+
+#### [NEW] [services/](file:///c:/Users/user/Downloads/TrainingAI/nexos-tecni-express-warehouse/services/)
+- Interface adapters for Supabase (e.g., `inventory.service.ts`, `product.service.ts`).
+
+---
+
+### 📦 Component Development
+
+#### [NEW] [components/common/List/](file:///c:/Users/user/Downloads/TrainingAI/nexos-tecni-express-warehouse/components/common/List/)
+- Implementation of high-performance lists using **FlashList**.
+
+#### [NEW] [components/forms/](file:///c:/Users/user/Downloads/TrainingAI/nexos-tecni-express-warehouse/components/forms/)
+- Generic form components with validation using `react-hook-form`.
+
+---
+
+### 📱 Feature Implementation
+
+#### 1. Inventory Management (CRUD)
+- **List**: Paginated view of stock levels per warehouse.
+- **Search**: Fast lookup by SKU, name, or barcode.
+- **Update**: Adjustments and movements.
+
+#### 2. Warehouse Transfers
+- **Form**: Create transfer requests between locations.
+- **Workflow**: Status updates (Pending -> Shipped -> Received).
+
+#### 3. Product Catalog
+- **Read**: Full product details, images, and compatibility.
+- **Scanner**: Camera-based search integration.
+
+#### 4. Inventory Counting (Stocktaking)
+- **Session Management**: Start/Stop sessions.
+- **Item Entry**: Scan and count workflow.
+
+## Verification Plan
+
+### Automated Tests
+- Unit tests for Use Cases using Jest.
+- Validation tests for Zod schemas.
+
+### Manual Verification
+- Visual inspection of UI responsiveness.
+- Scanning tests with physical device/camera simulator.
+- Real-time sync verification (changing data in Supabase and seeing it update in the app).
