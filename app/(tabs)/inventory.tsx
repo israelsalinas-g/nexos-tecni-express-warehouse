@@ -191,8 +191,9 @@ export default function InventoryScreen() {
           onRefresh={onRefresh} 
           refreshing={refreshing} 
           onItemPress={(item) => {
-            console.log('Pressed item:', item.sku)
+            router.push(`/product/${item.sku}`)
           }}
+
         />
       )}
 
