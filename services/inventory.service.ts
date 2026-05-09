@@ -9,9 +9,8 @@ export class InventoryService {
     const { data, error } = await supabase
       .from('inventory')
       .select('*, products(*, brands(*), categories(*), product_images(url)), warehouses(*)')
-
-      .eq('products.product_images.is_primary', true)
       .order('quantity', { ascending: true })
+
 
     if (error) throw error
     

@@ -21,8 +21,8 @@ export class ProductService {
       .from('products')
       .select('*, product_images(url)')
       .eq('sku', sku)
-      .eq('product_images.is_primary', true)
       .single()
+
 
     if (error || !data) return null
     
