@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, TextInput, Text, StyleSheet, TextInputProps } from 'react-native'
 import { useController, Control, FieldValues, Path } from 'react-hook-form'
+import { tokens } from '@/theme/tokens'
 
 interface Props<T extends FieldValues> extends TextInputProps {
   name: Path<T>
@@ -21,7 +22,6 @@ export const FormInput = <T extends FieldValues>({
     fieldState: { error },
   } = useController({ name, control })
 
-
   const errorMessage = error?.message || manualError
 
   return (
@@ -32,7 +32,9 @@ export const FormInput = <T extends FieldValues>({
         onBlur={onBlur}
         onChangeText={onChange}
         value={value}
-        placeholderTextColor="#9ca3af"
+        placeholderTextColor={tokens.colors.gray400}
+        accessible
+        accessibilityLabel={label || name}
         {...textInputProps}
       />
       {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
@@ -41,18 +43,24 @@ export const FormInput = <T extends FieldValues>({
 }
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 16 },
-  label: { fontSize: 14, color: '#374151', fontWeight: '600', marginBottom: 6 },
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#111827',
+  container: { marginBottom: tokens.spacing[4] },
+  label: { 
+    fontSize: tokens.typography.size.sm, 
+    color: tokens.colors.gray600, 
+    fontWeight: tokens.typography.weight.semibold, 
+    marginBottom: tokens.spacing[2] 
   },
-  inputError: { borderColor: '#dc2626' },
-  errorText: { color: '#dc2626', fontSize: 12, marginTop: 4 },
+  input: {
+    backgroundColor: tokens.colors.bgLight,
+    borderRadius: tokens.radius.lg,
+    borderWidth: 1,
+    borderColor: tokens.colors.gray200,
+    paddingHorizontal: tokens.spacing[4],
+    paddingVertical: tokens.spacing[3],
+    fontSize: tokens.typography.size.base,
+    color: tokens.colors.gray900,
+  },
+  inputError: { borderColor: tokens.colors.error },
+  errorText: { color: tokens.colors.error, fontSize: tokens.typography.size.xs, marginTop: tokens.spacing[1] },
 })
+

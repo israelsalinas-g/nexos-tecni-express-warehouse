@@ -1,15 +1,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, TouchableOpacity, 
-  ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
+  ActivityIndicator, Alert, 
 } from 'react-native'
 import { useLocalSearchParams, router } from 'expo-router'
 import { FlashList } from '@shopify/flash-list'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { InventoryCountService } from '@/services/inventory-count.service'
 import { ProductService } from '@/services/product.service'
-import { InventoryService } from '@/services/inventory.service'
 import { ScannerInput } from '@/components/common/ScannerInput'
+import { tokens } from '@/theme/tokens'
 
 interface CountItem {
   id:          string
@@ -25,7 +25,6 @@ export default function CountSessionScreen() {
   const [session, setSession] = useState<any>(null)
   const [items, setItems] = useState<CountItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
 
   const loadData = useCallback(async () => {
     if (!sessionId) return
@@ -39,7 +38,7 @@ export default function CountSessionScreen() {
         productId:   i.product_id,
         productName: i.products?.name_es || '—',
         sku:         i.products?.sku || '—',
-        systemQty:   0, // In real app, join or fetch system qty
+        systemQty:   0,
         counted:     i.counted_quantity,
       }))
       setItems(mapped)
@@ -61,7 +60,6 @@ export default function CountSessionScreen() {
         return
       }
 
-      // Check if already in list
       const exists = items.find(i => i.productId === product.id)
       if (exists) {
         Alert.alert('Aviso', 'Este producto ya está en la lista de conteo.')
@@ -105,22 +103,25 @@ export default function CountSessionScreen() {
       {
         text: 'Finalizar',
         onPress: async () => {
-          setSaving(true)
           try {
             await InventoryCountService.completeSession(sessionId)
             Alert.alert('Éxito', 'Conteo finalizado.')
             router.back()
           } catch (e: any) {
             Alert.alert('Error', e.message)
-          } finally {
-            setSaving(false)
           }
         }
       }
     ])
   }
 
-  if (loading) return <ActivityIndicator style={{ marginTop: 100 }} size="large" color="#2563eb" />
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={tokens.colors.primary} />
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -146,7 +147,6 @@ export default function CountSessionScreen() {
         data={items}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
-
         renderItem={({ item }) => (
           <View style={styles.itemRow}>
             <View style={styles.itemInfo}>
@@ -155,18 +155,18 @@ export default function CountSessionScreen() {
             </View>
             <View style={styles.counter}>
               <TouchableOpacity onPress={() => updateQuantity(item.id, -1)} style={styles.countBtn}>
-                <MaterialCommunityIcons name="minus" size={20} color="#374151" />
+                <MaterialCommunityIcons name="minus" size={20} color={tokens.colors.gray600} />
               </TouchableOpacity>
               <Text style={styles.countValue}>{item.counted}</Text>
               <TouchableOpacity onPress={() => updateQuantity(item.id, 1)} style={styles.countBtn}>
-                <MaterialCommunityIcons name="plus" size={20} color="#374151" />
+                <MaterialCommunityIcons name="plus" size={20} color={tokens.colors.gray600} />
               </TouchableOpacity>
             </View>
           </View>
         )}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <MaterialCommunityIcons name="clipboard-text-outline" size={48} color="#d1d5db" />
+            <MaterialCommunityIcons name="clipboard-text-outline" size={48} color={tokens.colors.gray200} />
             <Text style={styles.emptyText}>No has escaneado productos aún.</Text>
           </View>
         }
@@ -176,37 +176,41 @@ export default function CountSessionScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f4f6' },
+  container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
-    padding: 16, 
-    backgroundColor: '#fff',
+    padding: tokens.spacing[4], 
+    backgroundColor: tokens.colors.bgLight,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb'
+    borderBottomColor: tokens.colors.gray200,
+    ...tokens.shadow.sm,
   },
-  warehouseName: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  sessionStatus: { fontSize: 10, fontWeight: '800', color: '#16a34a', marginTop: 2 },
-  finishBtn: { backgroundColor: '#374151', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
-  finishBtnText: { color: '#fff', fontWeight: '600', fontSize: 13 },
-  scannerBox: { padding: 16, backgroundColor: '#fff' },
-  list: { padding: 16, paddingBottom: 40 },
+  warehouseName: { fontSize: tokens.typography.size.lg, fontWeight: tokens.typography.weight.bold, color: tokens.colors.gray900 },
+  sessionStatus: { fontSize: tokens.typography.size.xs, fontWeight: tokens.typography.weight.extrabold, color: tokens.colors.success, marginTop: 2 },
+  finishBtn: { backgroundColor: tokens.colors.secondary, paddingHorizontal: tokens.spacing[4], paddingVertical: tokens.spacing[2], borderRadius: tokens.radius.md },
+  finishBtnText: { color: tokens.colors.bgLight, fontWeight: tokens.typography.weight.semibold, fontSize: tokens.typography.size.sm },
+  scannerBox: { padding: tokens.spacing[4], backgroundColor: tokens.colors.bgLight },
+  list: { padding: tokens.spacing[4], paddingBottom: tokens.spacing[10] },
   itemRow: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    backgroundColor: '#fff', 
-    padding: 12, 
-    borderRadius: 12, 
-    marginBottom: 8 
+    backgroundColor: tokens.colors.bgLight, 
+    padding: tokens.spacing[3], 
+    borderRadius: tokens.radius.lg, 
+    marginBottom: tokens.spacing[2],
+    ...tokens.shadow.sm,
   },
-  itemInfo: { flex: 1, marginRight: 12 },
-  itemName: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  itemSku: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  counter: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: 8, padding: 4 },
-  countBtn: { padding: 6 },
-  countValue: { fontSize: 16, fontWeight: '700', color: '#111827', width: 30, textAlign: 'center' },
-  empty: { alignItems: 'center', marginTop: 60 },
-  emptyText: { color: '#9ca3af', marginTop: 12, fontSize: 14 },
+  itemInfo: { flex: 1, marginRight: tokens.spacing[3] },
+  itemName: { fontSize: tokens.typography.size.base, fontWeight: tokens.typography.weight.semibold, color: tokens.colors.gray900 },
+  itemSku: { fontSize: tokens.typography.size.xs, color: tokens.colors.gray400, marginTop: 2 },
+  counter: { flexDirection: 'row', alignItems: 'center', backgroundColor: tokens.colors.gray50, borderRadius: tokens.radius.md, padding: 4 },
+  countBtn: { padding: tokens.spacing[1] },
+  countValue: { fontSize: tokens.typography.size.base, fontWeight: tokens.typography.weight.bold, color: tokens.colors.gray900, width: 30, textAlign: 'center' },
+  empty: { alignItems: 'center', marginTop: tokens.spacing[10] },
+  emptyText: { color: tokens.colors.gray400, marginTop: tokens.spacing[3], fontSize: tokens.typography.size.base },
 })
+
 

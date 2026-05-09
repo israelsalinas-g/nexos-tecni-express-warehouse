@@ -7,62 +7,31 @@ import { Link } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { TransferService } from '@/services/transfer.service'
 import { ReceiveTransferUseCase } from '@/core/use-cases/receive-transfer.use-case'
-import { WarehouseTransfer } from '@/types/database.types'
+import { tokens } from '@/theme/tokens'
 
 export default function TransfersScreen() {
   const [transfers, setTransfers]     = useState<any[]>([])
   const [loading, setLoading]         = useState(true)
   const [refreshing, setRefreshing]   = useState(false)
 
-  const fetchTransfers = useCallback(async () => {
-    try {
-      // In a real app, we'd get the current warehouse ID from context/auth
-      // For now, let's assume we want to see all relevant transfers
-      const { data, error } = await (TransferService as any).getByWarehouse('any') // Adjusted for demo
-      // Wait, let's just use a simple list of pending transfers for now
-      setTransfers(data || [])
-    } catch (error) {
-      console.error('Error fetching transfers:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  // I'll re-implement the fetch logic correctly using the service I just built
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      // For the demo, let's fetch all transfers with status 'pending' or 'shipped'
-      const { data } = await (TransferService as any).getAllActive() // I'll need to add this method or use a generic one
-      setTransfers(data || [])
-    } catch (error) {
-      console.error(error)
+      const data = await TransferService.getByWarehouse('all')
+      setTransfers(data)
+    } catch (e) {
+      console.error(e)
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }, [])
 
-  useEffect(() => { 
-    // Since I haven't added 'getAllActive' to the service yet, I'll use a direct query here 
-    // but formatted through the service style soon.
-    const load = async () => {
-      setLoading(true)
-      try {
-        const data = await TransferService.getByWarehouse('all') // Modified service to handle 'all' if needed
-        setTransfers(data)
-      } catch (e) {
-        console.error(e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [])
+  useEffect(() => { loadData() }, [loadData])
 
   async function onRefresh() {
     setRefreshing(true)
-    // Refresh logic
-    setRefreshing(false)
+    await loadData()
   }
 
   async function handleReceive(transferId: string) {
@@ -75,7 +44,7 @@ export default function TransfersScreen() {
             const useCase = new ReceiveTransferUseCase()
             await useCase.execute({ transferId, receivedBy: 'user-id' })
             Alert.alert('Éxito', 'Traslado recibido correctamente.')
-            // Update local state
+            loadData()
           } catch (e: any) {
             Alert.alert('Error', e.message)
           }
@@ -85,7 +54,11 @@ export default function TransfersScreen() {
   }
 
   if (loading) {
-    return <ActivityIndicator style={{ marginTop: 60 }} size="large" color="#2563eb" />
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={tokens.colors.primary} />
+      </View>
+    )
   }
 
   return (
@@ -93,8 +66,13 @@ export default function TransfersScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Traslados</Text>
         <Link href="/transfers/new" asChild>
-          <TouchableOpacity style={styles.newBtn}>
-            <MaterialCommunityIcons name="plus" size={24} color="#fff" />
+          <TouchableOpacity 
+            style={styles.newBtn}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Nuevo traslado"
+          >
+            <MaterialCommunityIcons name="plus" size={24} color={tokens.colors.bgLight} />
           </TouchableOpacity>
         </Link>
       </View>
@@ -102,16 +80,35 @@ export default function TransfersScreen() {
       <FlatList
         data={transfers}
         keyExtractor={(item) => item.id}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            colors={[tokens.colors.primary]}
+          />
+        }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
-          <Text style={styles.empty}>No hay traslados activos.</Text>
+          <View style={styles.emptyContainer}>
+            <MaterialCommunityIcons name="swap-horizontal" size={48} color={tokens.colors.gray200} />
+            <Text style={styles.emptyText}>No hay traslados activos.</Text>
+          </View>
         }
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <View>
-                <Text style={styles.statusBadge}>{item.status.toUpperCase()}</Text>
+                <View style={[
+                  styles.statusBadge, 
+                  item.status === 'received' && styles.statusBadgeSuccess
+                ]}>
+                  <Text style={[
+                    styles.statusText,
+                    item.status === 'received' && styles.statusTextSuccess
+                  ]}>
+                    {item.status.toUpperCase()}
+                  </Text>
+                </View>
                 <Text style={styles.transferNo}>#{item.id.slice(0, 8)}</Text>
               </View>
               <Text style={styles.date}>{new Date(item.created_at).toLocaleDateString()}</Text>
@@ -120,12 +117,16 @@ export default function TransfersScreen() {
             <View style={styles.route}>
               <View style={styles.warehouseBox}>
                 <Text style={styles.warehouseLabel}>Origen</Text>
-                <Text style={styles.warehouseName}>{item.from?.name || 'Bodega A'}</Text>
+                <Text style={styles.warehouseName} numberOfLines={1}>
+                  {item.from?.name || 'Bodega A'}
+                </Text>
               </View>
-              <MaterialCommunityIcons name="arrow-right" size={20} color="#9ca3af" />
+              <MaterialCommunityIcons name="arrow-right" size={20} color={tokens.colors.gray400} />
               <View style={styles.warehouseBox}>
                 <Text style={styles.warehouseLabel}>Destino</Text>
-                <Text style={styles.warehouseName}>{item.to?.name || 'Bodega B'}</Text>
+                <Text style={styles.warehouseName} numberOfLines={1}>
+                  {item.to?.name || 'Bodega B'}
+                </Text>
               </View>
             </View>
 
@@ -133,6 +134,9 @@ export default function TransfersScreen() {
               <TouchableOpacity 
                 style={styles.receiveBtn} 
                 onPress={() => handleReceive(item.id)}
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Marcar como recibido"
               >
                 <Text style={styles.receiveBtnText}>Marcar como recibido</Text>
               </TouchableOpacity>
@@ -145,59 +149,97 @@ export default function TransfersScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f4f6' },
+  container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
-    padding: 16, 
-    backgroundColor: '#fff',
+    padding: tokens.spacing[4], 
+    backgroundColor: tokens.colors.bgLight,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb'
+    borderBottomColor: tokens.colors.gray200,
+    ...tokens.shadow.sm,
   },
-  title: { fontSize: 22, fontWeight: '800', color: '#111827' },
-  newBtn: { backgroundColor: '#2563eb', borderRadius: 12, padding: 8 },
-  list: { padding: 16, paddingBottom: 40 },
-  empty: { textAlign: 'center', color: '#9ca3af', marginTop: 60 },
+  title: { 
+    fontSize: tokens.typography.size.xl, 
+    fontWeight: tokens.typography.weight.extrabold, 
+    color: tokens.colors.gray900 
+  },
+  newBtn: { 
+    backgroundColor: tokens.colors.primary, 
+    borderRadius: tokens.radius.lg, 
+    padding: tokens.spacing[2] 
+  },
+  list: { padding: tokens.spacing[4], paddingBottom: tokens.spacing[10] },
+  emptyContainer: { alignItems: 'center', marginTop: tokens.spacing[12] },
+  emptyText: { color: tokens.colors.gray400, marginTop: tokens.spacing[3], fontSize: tokens.typography.size.base },
   card: { 
-    backgroundColor: '#fff', 
-    borderRadius: 16, 
-    padding: 16, 
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3
+    backgroundColor: tokens.colors.bgLight, 
+    borderRadius: tokens.radius.xl, 
+    padding: tokens.spacing[4], 
+    marginBottom: tokens.spacing[4],
+    ...tokens.shadow.md,
   },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
+  cardHeader: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'flex-start', 
+    marginBottom: tokens.spacing[4] 
+  },
   statusBadge: { 
-    fontSize: 10, 
-    fontWeight: '800', 
-    color: '#2563eb', 
-    backgroundColor: '#eff6ff', 
-    paddingHorizontal: 8, 
-    paddingVertical: 2, 
-    borderRadius: 6,
-    overflow: 'hidden',
+    backgroundColor: tokens.colors.gray100, 
+    paddingHorizontal: tokens.spacing[2], 
+    paddingVertical: 4, 
+    borderRadius: tokens.radius.md,
     alignSelf: 'flex-start',
-    marginBottom: 4
+    marginBottom: tokens.spacing[1]
   },
-  transferNo: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  date: { fontSize: 13, color: '#6b7280' },
+  statusBadgeSuccess: { backgroundColor: tokens.colors.success + '20' }, // 20% opacity
+  statusText: { 
+    fontSize: tokens.typography.size.xs, 
+    fontWeight: tokens.typography.weight.extrabold, 
+    color: tokens.colors.gray600 
+  },
+  statusTextSuccess: { color: tokens.colors.success },
+  transferNo: { 
+    fontSize: tokens.typography.size.base, 
+    fontWeight: tokens.typography.weight.bold, 
+    color: tokens.colors.gray900 
+  },
+  date: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray400 },
   route: { 
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between',
-    backgroundColor: '#f9fafb',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 16
+    backgroundColor: tokens.colors.gray50,
+    padding: tokens.spacing[3],
+    borderRadius: tokens.radius.lg,
+    marginBottom: tokens.spacing[4]
   },
   warehouseBox: { flex: 1 },
-  warehouseLabel: { fontSize: 10, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5 },
-  warehouseName: { fontSize: 14, fontWeight: '600', color: '#374151' },
-  receiveBtn: { backgroundColor: '#16a34a', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
-  receiveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  warehouseLabel: { 
+    fontSize: 10, 
+    color: tokens.colors.gray400, 
+    textTransform: 'uppercase', 
+    letterSpacing: 0.5 
+  },
+  warehouseName: { 
+    fontSize: tokens.typography.size.base, 
+    fontWeight: tokens.typography.weight.semibold, 
+    color: tokens.colors.gray800 
+  },
+  receiveBtn: { 
+    backgroundColor: tokens.colors.success, 
+    borderRadius: tokens.radius.lg, 
+    paddingVertical: tokens.spacing[3], 
+    alignItems: 'center' 
+  },
+  receiveBtnText: { 
+    color: tokens.colors.bgLight, 
+    fontSize: tokens.typography.size.base, 
+    fontWeight: tokens.typography.weight.bold 
+  },
 })
+
 

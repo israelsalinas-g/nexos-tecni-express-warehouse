@@ -3,38 +3,42 @@ import { Inventory, InventoryRow } from '@/types/database.types'
 
 export class InventoryService {
   /**
+   * Fetches all inventory records with products and warehouses
+   */
+  static async getAll(): Promise<InventoryRow[]> {
+    const { data, error } = await supabase
+      .from('inventory')
+      .select('*, products(*), warehouses(*)')
+      .order('quantity', { ascending: true })
+
+    if (error) throw error
+    return data as InventoryRow[]
+  }
+
+  /**
    * Fetches inventory rows for a specific warehouse
    */
   static async getByWarehouse(warehouseId: string, search?: string): Promise<InventoryRow[]> {
     let query = supabase
       .from('inventory')
-      .select('id, quantity, stock_min, products(id, name_es, sku)')
+      .select('*, products(*), warehouses(*)')
       .eq('warehouse_id', warehouseId)
       .order('quantity', { ascending: true })
 
     const { data, error } = await query
     if (error) throw error
 
-    let mapped = (data ?? []).map((r: any) => ({
-      id: r.id,
-      product: {
-        id:      r.products.id,
-        sku:     r.products.sku,
-        name_es: r.products.name_es,
-      },
-      quantity:  r.quantity,
-      stock_min: r.stock_min,
-    }))
+    let rows = data as InventoryRow[]
 
     if (search) {
       const s = search.toLowerCase()
-      mapped = mapped.filter(m => 
-        m.product.name_es.toLowerCase().includes(s) || 
-        m.product.sku.toLowerCase().includes(s)
+      rows = rows.filter(m => 
+        m.products?.name_es?.toLowerCase().includes(s) || 
+        m.products?.sku?.toLowerCase().includes(s)
       )
     }
 
-    return mapped
+    return rows
   }
 
   /**
@@ -52,20 +56,22 @@ export class InventoryService {
   /**
    * Fetches stock levels across all warehouses for a specific product
    */
-  static async getStockByProduct(productId: string): Promise<any[]> {
+  static async getByProduct(productId: string): Promise<InventoryRow[]> {
     const { data, error } = await supabase
       .from('inventory')
-      .select('quantity, stock_min, warehouses(id, name)')
+      .select('*, warehouses(*), products(*)')
       .eq('product_id', productId)
 
     if (error) throw error
+    return data as InventoryRow[]
+  }
 
-    return (data ?? []).map((row: any) => ({
-      warehouseId:   row.warehouses?.id ?? '',
-      warehouseName: row.warehouses?.name ?? 'Bodega',
-      quantity:      row.quantity,
-      stockMin:      row.stock_min,
-    }))
+  /**
+   * Alias for compatibility
+   */
+  static async getStockByProduct(productId: string) {
+    return this.getByProduct(productId)
   }
 }
+
 

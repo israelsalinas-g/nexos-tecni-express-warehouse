@@ -1,39 +1,29 @@
 import { useState } from 'react'
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
-import { BarcodeScanner } from '@/components/BarcodeScanner'
-import { ProductCard } from '@/components/ProductCard'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 import { ProductService } from '@/services/product.service'
 import { InventoryService } from '@/services/inventory.service'
-import { Product } from '@/types/database.types'
+import { tokens } from '@/theme/tokens'
 
 export default function ScanScreen() {
-  const [product, setProduct] = useState<any | null>(null)
-  const [notFound, setNotFound] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [lastScan, setLastScan] = useState<any>(null)
 
-  async function handleScanned(sku: string) {
-    setNotFound(false)
-    setProduct(null)
+  const handleScanned = async (sku: string) => {
     setLoading(true)
-
     try {
-      const productData = await ProductService.getBySku(sku)
-
-      if (!productData) {
-        setNotFound(true)
+      const product = await ProductService.getBySku(sku)
+      if (!product) {
+        Alert.alert('No encontrado', `El SKU ${sku} no existe en el sistema.`)
         return
       }
 
-      // Fetch inventory across all warehouses
-      const stock = await InventoryService.getStockByProduct(productData.id)
-
-      setProduct({
-        ...productData,
-        stock,
-      })
+      const inventory = await InventoryService.getByProduct(product.id)
+      setLastScan({ product, inventory })
     } catch (error) {
-      console.error('Scan error:', error)
-      setNotFound(true)
+      console.error(error)
+      Alert.alert('Error', 'Ocurrió un error al buscar el producto.')
     } finally {
       setLoading(false)
     }
@@ -41,47 +31,71 @@ export default function ScanScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.scanner}>
+      <View style={styles.scannerWrapper}>
         <BarcodeScanner onScanned={handleScanned} />
       </View>
 
-      <ScrollView style={styles.results} contentContainerStyle={styles.resultsContent}>
-        {notFound && (
-          <View style={styles.notFound}>
-            <Text style={styles.notFoundText}>Producto no encontrado</Text>
-            <Text style={styles.notFoundSub}>
-              El SKU "{product?.sku || ''}" no está registrado en el catálogo.
-            </Text>
+      <View style={styles.resultContainer}>
+        {loading ? (
+          <ActivityIndicator size="large" color={tokens.colors.primary} />
+        ) : lastScan ? (
+          <View style={styles.resultCard}>
+            <View style={styles.productInfo}>
+              <Text style={styles.productName}>{lastScan.product.name_es}</Text>
+              <Text style={styles.productSku}>{lastScan.product.sku}</Text>
+            </View>
+            <View style={styles.stockInfo}>
+              {lastScan.inventory.map((inv: any) => (
+                <View key={inv.warehouse_id} style={styles.stockRow}>
+                  <Text style={styles.warehouseName}>{inv.warehouses?.name}</Text>
+                  <Text style={styles.stockQty}>{inv.quantity} unid.</Text>
+                </View>
+              ))}
+            </View>
+            <TouchableOpacity 
+              style={styles.clearBtn} 
+              onPress={() => setLastScan(null)}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel="Limpiar resultado"
+            >
+              <Text style={styles.clearBtnText}>Escanear otro</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <MaterialCommunityIcons name="barcode-scan" size={48} color={tokens.colors.gray200} />
+            <Text style={styles.emptyText}>Escanea un producto para ver stock</Text>
           </View>
         )}
-
-        {product && (
-          <ProductCard
-            name={product.name_es}
-            sku={product.sku}
-            brand={product.brand_id} // Ideally we'd join brand name in service
-            stock={product.stock}
-          />
-        )}
-
-        {!notFound && !product && (
-          <Text style={styles.placeholder}>
-            Escanea un código de barras para ver la información del producto.
-          </Text>
-        )}
-      </ScrollView>
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f4f6' },
-  scanner:   { height: 280 },
-  results:   { flex: 1 },
-  resultsContent: { paddingVertical: 8, paddingBottom: 24 },
-  placeholder: { textAlign: 'center', color: '#9ca3af', fontSize: 14, marginTop: 32, paddingHorizontal: 32 },
-  notFound: { margin: 16, padding: 20, backgroundColor: '#fff', borderRadius: 12, alignItems: 'center' },
-  notFoundText: { fontSize: 16, fontWeight: '600', color: '#dc2626' },
-  notFoundSub:  { fontSize: 13, color: '#6b7280', marginTop: 6, textAlign: 'center' },
+  container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
+  scannerWrapper: { height: '50%', backgroundColor: '#000' },
+  resultContainer: { 
+    flex: 1, 
+    padding: tokens.spacing[4], 
+    justifyContent: 'center' 
+  },
+  resultCard: { 
+    backgroundColor: tokens.colors.bgLight, 
+    borderRadius: tokens.radius.xl, 
+    padding: tokens.spacing[5],
+    ...tokens.shadow.lg,
+  },
+  productInfo: { marginBottom: tokens.spacing[4], borderBottomWidth: 1, borderBottomColor: tokens.colors.gray100, paddingBottom: tokens.spacing[3] },
+  productName: { fontSize: tokens.typography.size.lg, fontWeight: tokens.typography.weight.bold, color: tokens.colors.gray900 },
+  productSku: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray400, marginTop: 2 },
+  stockInfo: { marginBottom: tokens.spacing[5] },
+  stockRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: tokens.spacing[2] },
+  warehouseName: { fontSize: tokens.typography.size.base, color: tokens.colors.gray600 },
+  stockQty: { fontSize: tokens.typography.size.base, fontWeight: tokens.typography.weight.bold, color: tokens.colors.primary },
+  clearBtn: { backgroundColor: tokens.colors.secondary, paddingVertical: tokens.spacing[3], borderRadius: tokens.radius.lg, alignItems: 'center' },
+  clearBtnText: { color: tokens.colors.bgLight, fontWeight: tokens.typography.weight.semibold },
+  emptyState: { alignItems: 'center' },
+  emptyText: { marginTop: tokens.spacing[3], color: tokens.colors.gray400, textAlign: 'center' },
 })
-

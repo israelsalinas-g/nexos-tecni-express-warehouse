@@ -11,6 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { FormInput } from '@/components/common/FormInput'
 import { FormScannerInput } from '@/components/common/FormScannerInput'
 import { CreateTransferUseCase } from '@/core/use-cases/create-transfer.use-case'
+import { tokens } from '@/theme/tokens'
 
 const transferSchema = z.object({
   fromWarehouseId: z.string().min(1, 'Selecciona bodega de origen'),
@@ -27,18 +28,16 @@ export default function NewTransferScreen() {
   const [items, setItems] = useState<{ productId: string, sku: string, quantity: number }[]>([])
   const [loading, setLoading] = useState(false)
 
-  const { control, handleSubmit, resetField, watch } = useForm<TransferForm>({
+  const { control, handleSubmit, resetField } = useForm<TransferForm>({
     resolver: zodResolver(transferSchema),
     defaultValues: {
-      fromWarehouseId: 'default-origin', // In real app, from user context
+      fromWarehouseId: 'default-origin',
       toWarehouseId:   '',
       quantity:        '1',
     }
   })
 
   const addItem = (data: TransferForm) => {
-    // In a real app, we'd lookup the productId by SKU using ProductService
-    // For now, let's simulate adding an item
     const newItem = {
       productId: 'temp-id-' + Math.random(),
       sku:       data.sku || 'Manual',
@@ -58,7 +57,6 @@ export default function NewTransferScreen() {
     setLoading(true)
     try {
       const useCase = new CreateTransferUseCase()
-      // Note: In real app, get fromWarehouseId and toWarehouseId from form state
       await useCase.execute({
         fromWarehouseId: 'origin-id',
         toWarehouseId:   'dest-id',
@@ -75,7 +73,11 @@ export default function NewTransferScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text style={styles.sectionTitle}>Configuración de Traslado</Text>
       <View style={styles.card}>
         <FormInput 
@@ -111,8 +113,11 @@ export default function NewTransferScreen() {
           <TouchableOpacity 
             style={styles.addBtn} 
             onPress={handleSubmit(addItem)}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Agregar producto a la lista"
           >
-            <MaterialCommunityIcons name="plus" size={24} color="#fff" />
+            <MaterialCommunityIcons name="plus" size={24} color={tokens.colors.bgLight} />
             <Text style={styles.addBtnText}>Agregar</Text>
           </TouchableOpacity>
         </View>
@@ -126,7 +131,7 @@ export default function NewTransferScreen() {
             <Text style={styles.itemQty}>Cantidad: {item.quantity}</Text>
           </View>
           <TouchableOpacity onPress={() => setItems(items.filter((_, i) => i !== idx))}>
-            <MaterialCommunityIcons name="delete-outline" size={22} color="#dc2626" />
+            <MaterialCommunityIcons name="delete-outline" size={22} color={tokens.colors.error} />
           </TouchableOpacity>
         </View>
       ))}
@@ -135,6 +140,9 @@ export default function NewTransferScreen() {
         style={[styles.submitBtn, loading && styles.submitBtnDisabled]} 
         onPress={handleCreate}
         disabled={loading}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="Confirmar y crear traslado"
       >
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitBtnText}>Crear Traslado</Text>}
       </TouchableOpacity>
@@ -143,33 +151,55 @@ export default function NewTransferScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f4f6' },
-  content: { padding: 16, paddingBottom: 40 },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', marginBottom: 8, marginTop: 16 },
-  card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 8 },
-  row: { flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
+  container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
+  content: { padding: tokens.spacing[4], paddingBottom: tokens.spacing[10] },
+  sectionTitle: { 
+    fontSize: tokens.typography.size.xs, 
+    fontWeight: tokens.typography.weight.bold, 
+    color: tokens.colors.gray400, 
+    textTransform: 'uppercase', 
+    letterSpacing: 1,
+    marginBottom: tokens.spacing[2], 
+    marginTop: tokens.spacing[4] 
+  },
+  card: { 
+    backgroundColor: tokens.colors.bgLight, 
+    borderRadius: tokens.radius.xl, 
+    padding: tokens.spacing[4], 
+    marginBottom: tokens.spacing[2],
+    ...tokens.shadow.sm,
+  },
+  row: { flexDirection: 'row', alignItems: 'flex-end', gap: tokens.spacing[3] },
   addBtn: { 
-    backgroundColor: '#374151', 
-    height: 48, 
-    borderRadius: 12, 
+    backgroundColor: tokens.colors.secondary, 
+    height: 52, 
+    borderRadius: tokens.radius.lg, 
     flexDirection: 'row', 
     alignItems: 'center', 
-    paddingHorizontal: 16,
-    marginBottom: 16
+    paddingHorizontal: tokens.spacing[4],
+    marginBottom: tokens.spacing[4]
   },
-  addBtnText: { color: '#fff', fontWeight: '600', marginLeft: 4 },
+  addBtnText: { color: tokens.colors.bgLight, fontWeight: tokens.typography.weight.semibold, marginLeft: tokens.spacing[1] },
   itemRow: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
-    backgroundColor: '#fff', 
-    padding: 12, 
-    borderRadius: 12, 
-    marginBottom: 8 
+    backgroundColor: tokens.colors.bgLight, 
+    padding: tokens.spacing[3], 
+    borderRadius: tokens.radius.lg, 
+    marginBottom: tokens.spacing[2],
+    ...tokens.shadow.sm,
   },
-  itemSku: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  itemQty: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  submitBtn: { backgroundColor: '#2563eb', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 32 },
-  submitBtnDisabled: { opacity: 0.7 },
-  submitBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  itemSku: { fontSize: tokens.typography.size.base, fontWeight: tokens.typography.weight.semibold, color: tokens.colors.gray900 },
+  itemQty: { fontSize: tokens.typography.size.xs, color: tokens.colors.gray400, marginTop: 2 },
+  submitBtn: { 
+    backgroundColor: tokens.colors.primary, 
+    borderRadius: tokens.radius.xl, 
+    paddingVertical: tokens.spacing[4], 
+    alignItems: 'center', 
+    marginTop: tokens.spacing[8] 
+  },
+  submitBtnDisabled: { opacity: 0.6 },
+  submitBtnText: { color: tokens.colors.bgLight, fontSize: tokens.typography.size.base, fontWeight: tokens.typography.weight.bold },
 })
+

@@ -1,33 +1,52 @@
 import React from 'react'
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { FlashList } from '@shopify/flash-list'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { InventoryRow } from '@/types/database.types'
-import { StockBadge } from '../StockBadge'
+import { tokens } from '@/theme/tokens'
 
 interface Props {
   data: InventoryRow[]
-  onPressItem?: (item: InventoryRow) => void
   onRefresh?: () => void
   refreshing?: boolean
+  onItemPress?: (item: InventoryRow) => void
 }
 
 export const InventoryList: React.FC<Props> = ({ 
   data, 
-  onPressItem, 
   onRefresh, 
-  refreshing 
+  refreshing,
+  onItemPress 
 }) => {
   const renderItem = ({ item }: { item: InventoryRow }) => (
-    <Pressable 
-      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-      onPress={() => onPressItem?.(item)}
+    <TouchableOpacity 
+      style={styles.card} 
+      onPress={() => onItemPress?.(item)}
+      activeOpacity={0.7}
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel={`Producto ${item.products?.name_es}, SKU ${item.products?.sku}, cantidad ${item.quantity}`}
     >
-      <View style={styles.rowInfo}>
-        <Text style={styles.rowName} numberOfLines={1}>{item.product.name_es}</Text>
-        <Text style={styles.rowSku}>{item.product.sku}</Text>
+      <View style={styles.cardHeader}>
+        <Text style={styles.productName} numberOfLines={1}>
+          {item.products?.name_es || 'Sin nombre'}
+        </Text>
+        <View style={styles.qtyBadge}>
+          <Text style={styles.qtyText}>{item.quantity}</Text>
+        </View>
       </View>
-      <StockBadge quantity={item.quantity} stockMin={item.stock_min} />
-    </Pressable>
+      
+      <View style={styles.cardFooter}>
+        <View style={styles.skuWrapper}>
+          <MaterialCommunityIcons name="barcode" size={14} color={tokens.colors.gray400} />
+          <Text style={styles.skuText}>{item.products?.sku || 'S/SKU'}</Text>
+        </View>
+        <View style={styles.warehouseWrapper}>
+          <MaterialCommunityIcons name="store" size={14} color={tokens.colors.gray400} />
+          <Text style={styles.warehouseText}>{item.warehouses?.name || 'S/B'}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   )
 
   return (
@@ -38,33 +57,79 @@ export const InventoryList: React.FC<Props> = ({
       refreshing={refreshing}
       contentContainerStyle={styles.list}
       ListEmptyComponent={
-        <Text style={styles.empty}>No se encontraron resultados.</Text>
+        <View style={styles.emptyContainer}>
+          <MaterialCommunityIcons name="package-variant" size={48} color={tokens.colors.gray200} />
+          <Text style={styles.emptyText}>No hay productos en el inventario.</Text>
+        </View>
       }
     />
   )
 }
 
-
-
 const styles = StyleSheet.create({
-  list: { paddingHorizontal: 12, paddingBottom: 20 },
-  empty: { textAlign: 'center', color: '#9ca3af', marginTop: 40, fontSize: 14 },
-  row: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 10,
+  list: { padding: tokens.spacing[4] },
+  card: {
+    backgroundColor: tokens.colors.bgLight,
+    borderRadius: tokens.radius.xl,
+    padding: tokens.spacing[4],
+    marginBottom: tokens.spacing[3],
+    ...tokens.shadow.sm,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: tokens.spacing[3],
+  },
+  productName: {
+    fontSize: tokens.typography.size.base,
+    fontWeight: tokens.typography.weight.bold,
+    color: tokens.colors.gray900,
+    flex: 1,
+    marginRight: tokens.spacing[2],
+  },
+  qtyBadge: {
+    backgroundColor: tokens.colors.gray100,
+    paddingHorizontal: tokens.spacing[3],
+    paddingVertical: tokens.spacing[1],
+    borderRadius: tokens.radius.md,
+  },
+  qtyText: {
+    fontSize: tokens.typography.size.sm,
+    fontWeight: tokens.typography.weight.bold,
+    color: tokens.colors.primary,
+  },
+  cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    // Subtle shadow for premium feel
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 15,
-    elevation: 2,
+    justifyContent: 'space-between',
   },
-  rowPressed: { backgroundColor: '#f9fafb', opacity: 0.8 },
-  rowInfo:  { flex: 1, marginRight: 12 },
-  rowName:  { fontSize: 16, color: '#111827', fontWeight: '600' },
-  rowSku:   { fontSize: 13, color: '#6b7280', marginTop: 2, fontWeight: '400' },
+  skuWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  skuText: {
+    fontSize: tokens.typography.size.xs,
+    color: tokens.colors.gray600,
+    marginLeft: tokens.spacing[1],
+  },
+  warehouseWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  warehouseText: {
+    fontSize: tokens.typography.size.xs,
+    color: tokens.colors.gray400,
+    marginLeft: tokens.spacing[1],
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: tokens.spacing[10],
+  },
+  emptyText: {
+    marginTop: tokens.spacing[4],
+    color: tokens.colors.gray400,
+    fontSize: tokens.typography.size.base,
+  },
 })

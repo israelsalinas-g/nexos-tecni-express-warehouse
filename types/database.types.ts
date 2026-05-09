@@ -100,9 +100,8 @@ export interface InventoryCountItem {
 }
 
 // UI / Business Logic Wrappers
-export interface InventoryRow {
-  id: string
-  product: Pick<Product, 'id' | 'sku' | 'name_es'>
-  quantity: number
-  stock_min: number
+export interface InventoryRow extends Inventory {
+  products?: Product
+  warehouses?: Warehouse
 }
+

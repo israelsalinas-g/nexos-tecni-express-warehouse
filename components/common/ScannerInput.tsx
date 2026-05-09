@@ -4,6 +4,7 @@ import {
   Modal, Text, SafeAreaView 
 } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { tokens } from '@/theme/tokens'
 import { BarcodeScanner } from './BarcodeScanner'
 
 interface Props {
@@ -38,13 +39,18 @@ export const ScannerInput: React.FC<Props> = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={tokens.colors.gray400}
+          accessible
+          accessibilityLabel={label || 'Entrada de código de barras'}
         />
         <TouchableOpacity 
           style={styles.scanButton}
           onPress={() => setIsScannerVisible(true)}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Abrir escáner"
         >
-          <MaterialCommunityIcons name="barcode-scan" size={24} color="#2563eb" />
+          <MaterialCommunityIcons name="barcode-scan" size={24} color={tokens.colors.primary} />
         </TouchableOpacity>
       </View>
       
@@ -61,8 +67,11 @@ export const ScannerInput: React.FC<Props> = ({
             <TouchableOpacity 
               onPress={() => setIsScannerVisible(false)}
               style={styles.closeButton}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel="Cerrar escáner"
             >
-              <MaterialCommunityIcons name="close" size={24} color="#374151" />
+              <MaterialCommunityIcons name="close" size={24} color={tokens.colors.gray800} />
             </TouchableOpacity>
           </View>
           
@@ -80,44 +89,50 @@ export const ScannerInput: React.FC<Props> = ({
 }
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 16 },
-  label: { fontSize: 14, color: '#374151', fontWeight: '600', marginBottom: 6 },
+  container: { marginBottom: tokens.spacing[4] },
+  label: { 
+    fontSize: tokens.typography.size.sm, 
+    color: tokens.colors.gray600, 
+    fontWeight: tokens.typography.weight.semibold, 
+    marginBottom: tokens.spacing[2] 
+  },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: tokens.colors.bgLight,
+    borderRadius: tokens.radius.lg,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: tokens.colors.gray200,
     overflow: 'hidden',
   },
   input: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#111827',
+    paddingHorizontal: tokens.spacing[4],
+    paddingVertical: tokens.spacing[3],
+    fontSize: tokens.typography.size.base,
+    color: tokens.colors.gray900,
   },
   scanButton: {
-    padding: 12,
-    backgroundColor: '#eff6ff',
+    padding: tokens.spacing[3],
+    backgroundColor: tokens.colors.gray100,
     borderLeftWidth: 1,
-    borderLeftColor: '#e5e7eb',
+    borderLeftColor: tokens.colors.gray200,
   },
-  inputError: { borderColor: '#dc2626' },
-  errorText: { color: '#dc2626', fontSize: 12, marginTop: 4 },
+  inputError: { borderColor: tokens.colors.error },
+  errorText: { color: tokens.colors.error, fontSize: tokens.typography.size.xs, marginTop: tokens.spacing[1] },
   
   modalContainer: { flex: 1, backgroundColor: '#000' },
   modalHeader: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+    padding: tokens.spacing[4],
+    backgroundColor: tokens.colors.bgLight,
   },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  closeButton: { padding: 4 },
+  modalTitle: { fontSize: tokens.typography.size.lg, fontWeight: tokens.typography.weight.bold, color: tokens.colors.gray900 },
+  closeButton: { padding: tokens.spacing[1] },
   scannerWrapper: { flex: 1 },
-  modalFooter: { padding: 20, alignItems: 'center', backgroundColor: '#000' },
-  modalHint: { color: '#fff', fontSize: 14, opacity: 0.8 },
+  modalFooter: { padding: tokens.spacing[5], alignItems: 'center', backgroundColor: '#000' },
+  modalHint: { color: '#fff', fontSize: tokens.typography.size.sm, opacity: 0.8 },
 })
+
