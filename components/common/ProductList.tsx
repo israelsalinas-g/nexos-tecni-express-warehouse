@@ -83,7 +83,7 @@ export const ProductList: React.FC<Props> = ({
           </View>
           <View style={styles.detailItem}>
             <Text style={styles.detailLabel}>Precio Sug.</Text>
-            <Text style={styles.detailValue}>$184.50</Text>
+            <Text style={styles.detailValue}>L. 184.50</Text>
           </View>
         </View>
 
@@ -100,7 +100,7 @@ export const ProductList: React.FC<Props> = ({
         </View>
 
         <View style={styles.cardFooter}>
-          <Text style={styles.priceText}>$184.50</Text>
+          <Text style={styles.priceText}>L. {item.price || '184.50'}</Text>
           <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
             <MaterialCommunityIcons name={statusIcon} size={14} color="#fff" />
             <Text style={styles.statusText}>Total: {item.totalStock}</Text>

@@ -111,7 +111,8 @@ export default function ProductDetailScreen() {
             </View>
             <View style={styles.priceTag}>
               <Text style={styles.priceLabel}>Precio Sugerido</Text>
-              <Text style={styles.priceValue}>${product.base_price?.toFixed(2)}</Text>
+              <Text style={styles.priceValue}>L. {product.base_price?.toFixed(2)}</Text>
+
             </View>
           </View>
 
