@@ -80,15 +80,24 @@ export default function ProductDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header Image Section */}
         <View style={styles.imageContainer}>
-          <Image 
-            source={{ uri: product.main_image_url || PLACEHOLDER_IMAGE }} 
-            style={styles.image}
-            resizeMode="cover"
-          />
+          {product.main_image_url ? (
+            <Image 
+              source={{ uri: product.main_image_url }} 
+              style={styles.image}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.noImageContainer}>
+              <MaterialCommunityIcons name="image-off-outline" size={64} color={tokens.colors.gray400} />
+
+              <Text style={styles.noImageText}>Sin imagen disponible</Text>
+            </View>
+          )}
           <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
             <MaterialCommunityIcons name="chevron-left" size={28} color={tokens.colors.gray900} />
           </TouchableOpacity>
         </View>
+
 
         <View style={styles.content}>
           {/* Title & Price Row */}
@@ -200,7 +209,21 @@ const styles = StyleSheet.create({
     height: 320,
     position: 'relative',
   },
+  noImageContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: tokens.colors.gray100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noImageText: {
+    marginTop: 10,
+    color: tokens.colors.gray400,
+    fontSize: tokens.typography.size.sm,
+    fontWeight: '500',
+  },
   image: {
+
     width: '100%',
     height: '100%',
   },
