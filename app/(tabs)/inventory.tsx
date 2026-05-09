@@ -120,10 +120,15 @@ export default function InventoryScreen() {
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>Inventario</Text>
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.7}>
+          <TouchableOpacity 
+            style={styles.addButton} 
+            activeOpacity={0.7}
+            onPress={() => router.push('/product/new')}
+          >
             <MaterialCommunityIcons name="plus" size={20} color={tokens.colors.primary} />
             <Text style={styles.addButtonText}>Nuevo</Text>
           </TouchableOpacity>
+
         </View>
 
         <View style={styles.searchWrapper}>

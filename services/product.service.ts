@@ -49,4 +49,22 @@ export class ProductService {
     if (error) throw error
     return data ?? []
   }
+  /**
+   * Creates a new product
+   */
+  static async create(product: Partial<Product>): Promise<Product> {
+    const slug = product.name_es?.toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[^\w-]+/g, '') || `product-${Date.now()}`
+
+    const { data, error } = await supabase
+      .from('products')
+      .insert([{ ...product, slug }])
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
 }
+
