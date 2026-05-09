@@ -1,25 +1,26 @@
 import React from 'react'
 import { View, TextInput, Text, StyleSheet, TextInputProps } from 'react-native'
-import { useController, Control } from 'react-hook-form'
+import { useController, Control, FieldValues, Path } from 'react-hook-form'
 
-interface Props extends TextInputProps {
-  name: string
-  control: Control<any>
+interface Props<T extends FieldValues> extends TextInputProps {
+  name: Path<T>
+  control: Control<T>
   label?: string
   error?: string
 }
 
-export const FormInput: React.FC<Props> = ({
+export const FormInput = <T extends FieldValues>({
   name,
   control,
   label,
   error: manualError,
   ...textInputProps
-}) => {
+}: Props<T>) => {
   const {
     field: { onChange, onBlur, value },
     fieldState: { error },
   } = useController({ name, control })
+
 
   const errorMessage = error?.message || manualError
 
