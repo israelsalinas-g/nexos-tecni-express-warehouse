@@ -24,13 +24,17 @@ export default function RootLayout() {
     if (session === undefined) return  // still loading
 
     const inAuthGroup = segments[0] === '(auth)'
+    console.log('Navigation State:', { session: !!session, segments, inAuthGroup })
 
     if (!session && !inAuthGroup) {
+      console.log('Redirecting to login...')
       router.replace('/(auth)/login')
     } else if (session && inAuthGroup) {
-      router.replace('/(tabs)/scan')
+      console.log('Redirecting to dashboard...')
+      router.replace('/(tabs)')
     }
   }, [session, segments])
+
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
