@@ -16,6 +16,8 @@ export default function LoginScreen() {
 
   async function handleLogin() {
     const cleanEmail = email.trim()
+    console.log('Login attempt started for:', cleanEmail)
+    
     if (!cleanEmail || !password) {
       Alert.alert('Campos requeridos', 'Ingresa tu correo y contraseña.')
       return
@@ -23,22 +25,28 @@ export default function LoginScreen() {
 
     setLoading(true)
     try {
+      console.log('Calling signInWithPassword...')
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email: cleanEmail, 
         password 
       })
 
       if (error) {
+        console.log('Auth error:', error.message)
         setLoading(false)
-        Alert.alert('Error de acceso', error.message || 'Credenciales inválidas. Verifica tu correo y contraseña.')
+        Alert.alert('Error de acceso', error.message || 'Credenciales inválidas.')
         return
       }
 
       if (!data.user) {
+        console.log('No user data returned')
         setLoading(false)
         Alert.alert('Error', 'No se pudo obtener la información del usuario.')
         return
       }
+
+      console.log('Auth success. User ID:', data.user.id)
+      console.log('Fetching profile...')
 
       // Verify this user is a warehouse admin or superadmin
       const { data: profile, error: profileError } = await supabase
@@ -48,14 +56,17 @@ export default function LoginScreen() {
         .single()
 
       if (profileError) {
-        console.error('Profile error:', profileError)
+        console.log('Profile fetch error:', profileError.message)
         await supabase.auth.signOut()
         setLoading(false)
-        Alert.alert('Error de perfil', 'No se pudo verificar tus permisos.')
+        Alert.alert('Error de perfil', 'No se pudo verificar tus permisos: ' + profileError.message)
         return
       }
 
+      console.log('Profile found:', profile)
+
       if (!profile?.is_admin || (profile.admin_role !== 'superadmin' && profile.admin_role !== 'warehouse' && profile.admin_role !== 'sales')) {
+        console.log('Access denied. Role:', profile?.admin_role, 'is_admin:', profile?.is_admin)
         await supabase.auth.signOut()
         setLoading(false)
         Alert.alert(
@@ -65,13 +76,15 @@ export default function LoginScreen() {
         return
       }
 
+      console.log('Login successful!')
       setLoading(false)
     } catch (err: any) {
+      console.error('CRITICAL LOGIN ERROR:', err)
       setLoading(false)
-      console.error('Login crash:', err)
       Alert.alert('Error inesperado', err.message || 'Ocurrió un error al intentar iniciar sesión.')
     }
   }
+
 
 
   return (

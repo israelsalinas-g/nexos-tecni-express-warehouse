@@ -1,8 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import * as SecureStore from 'expo-secure-store'
 
-const supabaseUrl  = process.env.EXPO_PUBLIC_SUPABASE_URL!
-const supabaseAnon = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl  = process.env.EXPO_PUBLIC_SUPABASE_URL
+const supabaseAnon = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnon) {
+  console.error('Supabase configuration missing! Check your .env file.')
+}
+
 
 // SecureStore adapter — replaces AsyncStorage for auth persistence
 const SecureStoreAdapter = {
