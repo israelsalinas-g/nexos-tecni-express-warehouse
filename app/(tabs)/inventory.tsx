@@ -1,20 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
-  View, Text, FlatList, TouchableOpacity, StyleSheet,
-  ActivityIndicator, TextInput, RefreshControl,
+  View, Text, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity,
 } from 'react-native'
 import { supabase } from '@/lib/supabase'
-import { StockBadge } from '@/components/StockBadge'
-
-interface Warehouse { id: string; name: string }
-
-interface InventoryRow {
-  id: string
-  productName: string
-  sku: string
-  quantity: number
-  stockMin: number
-}
+import { InventoryService } from '@/services/inventory.service'
+import { InventoryList } from '@/components/common/InventoryList'
+import { Warehouse, InventoryRow } from '@/types/database.types'
 
 export default function InventoryScreen() {
   const [warehouses, setWarehouses]     = useState<Warehouse[]>([])
@@ -24,16 +15,18 @@ export default function InventoryScreen() {
   const [loading, setLoading]           = useState(true)
   const [refreshing, setRefreshing]     = useState(false)
 
+  // Load active warehouses on mount
   useEffect(() => {
     supabase
       .from('warehouses')
-      .select('id, name')
+      .select('*')
       .eq('is_active', true)
       .order('name')
       .then(({ data }) => {
         if (data && data.length > 0) {
-          setWarehouses(data)
-          setSelectedWh(data[0].id)
+          const whs = data as Warehouse[]
+          setWarehouses(whs)
+          setSelectedWh(whs[0].id)
         }
       })
   }, [])
@@ -41,30 +34,14 @@ export default function InventoryScreen() {
   const fetchInventory = useCallback(async () => {
     if (!selectedWh) return
     setLoading(true)
-
-    let query = supabase
-      .from('inventory')
-      .select('id, quantity, stock_min, products(id, name_es, sku)')
-      .eq('warehouse_id', selectedWh)
-      .order('quantity', { ascending: true })
-
-    const { data } = await query
-    const mapped = (data ?? [])
-      .map((r) => ({
-        id:          r.id,
-        productName: (r.products as { id: string; name_es: string; sku: string } | null)?.name_es ?? '',
-        sku:         (r.products as { id: string; name_es: string; sku: string } | null)?.sku ?? '',
-        quantity:    r.quantity,
-        stockMin:    r.stock_min,
-      }))
-      .filter((r) =>
-        !search ||
-        r.productName.toLowerCase().includes(search.toLowerCase()) ||
-        r.sku.toLowerCase().includes(search.toLowerCase()),
-      )
-
-    setRows(mapped)
-    setLoading(false)
+    try {
+      const data = await InventoryService.getByWarehouse(selectedWh, search)
+      setRows(data)
+    } catch (error) {
+      console.error('Error fetching inventory:', error)
+    } finally {
+      setLoading(false)
+    }
   }, [selectedWh, search])
 
   useEffect(() => { fetchInventory() }, [fetchInventory])
@@ -77,7 +54,7 @@ export default function InventoryScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Warehouse selector */}
+      {/* Warehouse selector (Tabs) */}
       <View style={styles.tabBar}>
         {warehouses.map((wh) => (
           <TouchableOpacity
@@ -92,7 +69,7 @@ export default function InventoryScreen() {
         ))}
       </View>
 
-      {/* Search */}
+      {/* Search Bar */}
       <TextInput
         style={styles.search}
         placeholder="Buscar por nombre o SKU..."
@@ -102,26 +79,17 @@ export default function InventoryScreen() {
         clearButtonMode="while-editing"
       />
 
-      {loading ? (
+      {loading && !refreshing ? (
         <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#2563eb" />
       ) : (
-        <FlatList
-          data={rows}
-          keyExtractor={(item) => item.id}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          contentContainerStyle={styles.list}
-          ListEmptyComponent={
-            <Text style={styles.empty}>Sin resultados para esta bodega.</Text>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.row}>
-              <View style={styles.rowInfo}>
-                <Text style={styles.rowName} numberOfLines={1}>{item.productName}</Text>
-                <Text style={styles.rowSku}>{item.sku}</Text>
-              </View>
-              <StockBadge quantity={item.quantity} stockMin={item.stockMin} />
-            </View>
-          )}
+        <InventoryList 
+          data={rows} 
+          onRefresh={onRefresh} 
+          refreshing={refreshing}
+          onPressItem={(item) => {
+            // TODO: Navigate to inventory details/adjustment
+            console.log('Pressed item:', item.product.sku)
+          }}
         />
       )}
     </View>
@@ -130,33 +98,39 @@ export default function InventoryScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f3f4f6' },
-  tabBar: { flexDirection: 'row', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
-  tabActive: { borderBottomWidth: 2, borderBottomColor: '#2563eb' },
-  tabText: { fontSize: 14, color: '#6b7280', fontWeight: '500' },
-  tabTextActive: { color: '#2563eb', fontWeight: '700' },
+  tabBar: { 
+    flexDirection: 'row', 
+    backgroundColor: '#fff', 
+    borderBottomWidth: 1, 
+    borderBottomColor: '#e5e7eb',
+    paddingHorizontal: 8,
+  },
+  tab: { 
+    flex: 1, 
+    paddingVertical: 14, 
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: { borderBottomColor: '#2563eb' },
+  tabText: { fontSize: 13, color: '#6b7280', fontWeight: '600' },
+  tabTextActive: { color: '#2563eb' },
   search: {
     margin: 12,
     backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     fontSize: 15,
     color: '#111827',
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    // Slight shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  list: { paddingHorizontal: 12, paddingBottom: 20 },
-  empty: { textAlign: 'center', color: '#9ca3af', marginTop: 40, fontSize: 14 },
-  row: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rowInfo:  { flex: 1, marginRight: 12 },
-  rowName:  { fontSize: 15, color: '#111827', fontWeight: '500' },
-  rowSku:   { fontSize: 12, color: '#6b7280', marginTop: 2 },
 })
+

@@ -2,56 +2,41 @@ import { useState } from 'react'
 import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import { BarcodeScanner } from '@/components/BarcodeScanner'
 import { ProductCard } from '@/components/ProductCard'
-import { supabase } from '@/lib/supabase'
-
-interface ProductResult {
-  id: string
-  name_es: string
-  sku: string
-  brand: { name: string } | null
-  stock: { warehouseId: string; warehouseName: string; quantity: number; stockMin: number }[]
-}
+import { ProductService } from '@/services/product.service'
+import { InventoryService } from '@/services/inventory.service'
+import { Product } from '@/types/database.types'
 
 export default function ScanScreen() {
-  const navigation = useNavigation()
-  const [product, setProduct] = useState<ProductResult | null>(null)
+  const [product, setProduct] = useState<any | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   async function handleScanned(sku: string) {
     setNotFound(false)
     setProduct(null)
+    setLoading(true)
 
-    const { data: productData, error } = await supabase
-      .from('products')
-      .select('id, name_es, sku, brands(name)')
-      .eq('sku', sku)
-      .single()
+    try {
+      const productData = await ProductService.getBySku(sku)
 
-    if (error || !productData) {
+      if (!productData) {
+        setNotFound(true)
+        return
+      }
+
+      // Fetch inventory across all warehouses
+      const stock = await InventoryService.getStockByProduct(productData.id)
+
+      setProduct({
+        ...productData,
+        stock,
+      })
+    } catch (error) {
+      console.error('Scan error:', error)
       setNotFound(true)
-      return
+    } finally {
+      setLoading(false)
     }
-
-    // Fetch inventory across all warehouses
-    const { data: inventoryRows } = await supabase
-      .from('inventory')
-      .select('quantity, stock_min, warehouses(id, name)')
-      .eq('product_id', productData.id)
-
-    const stock = (inventoryRows ?? []).map((row) => ({
-      warehouseId:   (row.warehouses as { id: string; name: string } | null)?.id ?? '',
-      warehouseName: (row.warehouses as { id: string; name: string } | null)?.name ?? 'Bodega',
-      quantity:      row.quantity,
-      stockMin:      row.stock_min,
-    }))
-
-    setProduct({
-      id:     productData.id,
-      name_es: productData.name_es,
-      sku:    productData.sku,
-      brand:  (productData.brands as { name: string } | null),
-      stock,
-    })
   }
 
   return (
@@ -64,7 +49,9 @@ export default function ScanScreen() {
         {notFound && (
           <View style={styles.notFound}>
             <Text style={styles.notFoundText}>Producto no encontrado</Text>
-            <Text style={styles.notFoundSub}>Verifica que el SKU esté registrado en el catálogo.</Text>
+            <Text style={styles.notFoundSub}>
+              El SKU "{product?.sku || ''}" no está registrado en el catálogo.
+            </Text>
           </View>
         )}
 
@@ -72,7 +59,7 @@ export default function ScanScreen() {
           <ProductCard
             name={product.name_es}
             sku={product.sku}
-            brand={product.brand?.name}
+            brand={product.brand_id} // Ideally we'd join brand name in service
             stock={product.stock}
           />
         )}
@@ -97,3 +84,4 @@ const styles = StyleSheet.create({
   notFoundText: { fontSize: 16, fontWeight: '600', color: '#dc2626' },
   notFoundSub:  { fontSize: 13, color: '#6b7280', marginTop: 6, textAlign: 'center' },
 })
+
