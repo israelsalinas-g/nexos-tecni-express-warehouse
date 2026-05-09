@@ -25,21 +25,42 @@ export default function InventoryScreen() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [invData, brandData, catData] = await Promise.all([
+      console.log('Fetching inventory data...')
+      const [invResult, brandResult, catResult] = await Promise.allSettled([
         InventoryService.getAll(),
         InventoryService.getBrands(),
         InventoryService.getCategories()
       ])
-      setInventory(invData)
-      setBrands(brandData)
-      setCategories(catData)
+
+      if (invResult.status === 'fulfilled') {
+        console.log('Inventory loaded:', invResult.value.length, 'rows')
+        setInventory(invResult.value)
+      } else {
+        console.error('Inventory error:', invResult.reason)
+      }
+
+      if (brandResult.status === 'fulfilled') {
+        console.log('Brands loaded:', brandResult.value.length)
+        setBrands(brandResult.value)
+      } else {
+        console.error('Brands error:', brandResult.reason)
+      }
+
+      if (catResult.status === 'fulfilled') {
+        console.log('Categories loaded:', catResult.value.length)
+        setCategories(catResult.value)
+      } else {
+        console.error('Categories error:', catResult.reason)
+      }
+
     } catch (error) {
-      console.error(error)
+      console.error('Global fetch error:', error)
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
   }, [])
+
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -271,8 +292,9 @@ const styles = StyleSheet.create({
     marginRight: tokens.spacing[2],
     borderWidth: 1,
     borderColor: tokens.colors.gray200,
-    ...tokens.shadow.xs,
+    ...tokens.shadow.sm,
   },
+
   chipActive: {
     backgroundColor: tokens.colors.primary,
     borderColor: tokens.colors.primary,
