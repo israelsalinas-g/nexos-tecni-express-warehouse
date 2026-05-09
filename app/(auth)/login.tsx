@@ -4,12 +4,14 @@ import {
   StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, 
   Platform, Image,
 } from 'react-native'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
 import { tokens } from '@/theme/tokens'
 
 export default function LoginScreen() {
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading]   = useState(false)
 
   async function handleLogin() {
@@ -64,25 +66,43 @@ export default function LoginScreen() {
         <Text style={styles.title}>Sistema de Bodega</Text>
         <Text style={styles.subtitle}>Gestión de Inventario y Traslados</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Correo electrónico"
-          placeholderTextColor={tokens.colors.gray400}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          placeholderTextColor={tokens.colors.gray400}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoComplete="password"
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Correo electrónico"
+            placeholderTextColor={tokens.colors.gray400}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            placeholderTextColor={tokens.colors.gray400}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            autoComplete="password"
+          />
+          <TouchableOpacity 
+            style={styles.eyeIcon} 
+            onPress={() => setShowPassword(!showPassword)}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          >
+            <MaterialCommunityIcons 
+              name={showPassword ? "eye-off" : "eye"} 
+              size={22} 
+              color={tokens.colors.gray400} 
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
@@ -137,16 +157,24 @@ const styles = StyleSheet.create({
     marginBottom: tokens.spacing[8],
     marginTop: tokens.spacing[1],
   },
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: tokens.spacing[4],
+    backgroundColor: tokens.colors.gray50,
     borderWidth: 1,
     borderColor: tokens.colors.gray200,
     borderRadius: tokens.radius.lg,
+  },
+  input: {
+    flex: 1,
     paddingHorizontal: tokens.spacing[4],
     paddingVertical: tokens.spacing[3],
     fontSize: tokens.typography.size.base,
     color: tokens.colors.gray900,
-    marginBottom: tokens.spacing[4],
-    backgroundColor: tokens.colors.gray50,
+  },
+  eyeIcon: {
+    paddingHorizontal: tokens.spacing[3],
   },
   button: {
     backgroundColor: tokens.colors.primary,
@@ -168,4 +196,5 @@ const styles = StyleSheet.create({
     fontSize: tokens.typography.size.xs,
   },
 })
+
 
