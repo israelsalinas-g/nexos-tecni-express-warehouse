@@ -15,39 +15,64 @@ export default function LoginScreen() {
   const [loading, setLoading]   = useState(false)
 
   async function handleLogin() {
-    if (!email || !password) {
+    const cleanEmail = email.trim()
+    if (!cleanEmail || !password) {
       Alert.alert('Campos requeridos', 'Ingresa tu correo y contraseña.')
       return
     }
 
     setLoading(true)
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ 
+        email: cleanEmail, 
+        password 
+      })
 
-    if (error) {
+      if (error) {
+        setLoading(false)
+        Alert.alert('Error de acceso', error.message || 'Credenciales inválidas. Verifica tu correo y contraseña.')
+        return
+      }
+
+      if (!data.user) {
+        setLoading(false)
+        Alert.alert('Error', 'No se pudo obtener la información del usuario.')
+        return
+      }
+
+      // Verify this user is a warehouse admin or superadmin
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin, admin_role')
+        .eq('id', data.user.id)
+        .single()
+
+      if (profileError) {
+        console.error('Profile error:', profileError)
+        await supabase.auth.signOut()
+        setLoading(false)
+        Alert.alert('Error de perfil', 'No se pudo verificar tus permisos.')
+        return
+      }
+
+      if (!profile?.is_admin || (profile.admin_role !== 'superadmin' && profile.admin_role !== 'warehouse' && profile.admin_role !== 'sales')) {
+        await supabase.auth.signOut()
+        setLoading(false)
+        Alert.alert(
+          'Acceso denegado',
+          'Esta app es exclusiva para personal autorizado de bodega.',
+        )
+        return
+      }
+
       setLoading(false)
-      Alert.alert('Error de acceso', 'Credenciales inválidas. Verifica tu correo y contraseña.')
-      return
-    }
-
-    // Verify this user is a warehouse admin or superadmin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin, admin_role')
-      .eq('id', data.user.id)
-      .single()
-
-    if (profileError || !profile?.is_admin || (profile.admin_role !== 'superadmin' && profile.admin_role !== 'warehouse' && profile.admin_role !== 'sales')) {
-      await supabase.auth.signOut()
+    } catch (err: any) {
       setLoading(false)
-      Alert.alert(
-        'Acceso denegado',
-        'Esta app es exclusiva para personal autorizado de bodega.',
-      )
-      return
+      console.error('Login crash:', err)
+      Alert.alert('Error inesperado', err.message || 'Ocurrió un error al intentar iniciar sesión.')
     }
-
-    setLoading(false)
   }
+
 
   return (
     <KeyboardAvoidingView

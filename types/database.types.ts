@@ -8,9 +8,12 @@ export interface Profile {
   email: string
   full_name?: string
   role: 'admin' | 'staff' | 'customer'
+  is_admin: boolean
+  admin_role?: 'superadmin' | 'warehouse' | 'sales'
   avatar_url?: string
   created_at: string
 }
+
 
 export interface Warehouse {
   id: string
