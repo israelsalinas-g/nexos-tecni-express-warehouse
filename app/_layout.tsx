@@ -23,17 +23,20 @@ export default function RootLayout() {
   useEffect(() => {
     if (session === undefined) return  // still loading
 
-    const inAuthGroup = segments[0] === '(auth)'
-    console.log('Navigation State:', { session: !!session, segments, inAuthGroup })
+    const inAuthGroup = segments.includes('(auth)')
+    const inTabsGroup = segments.includes('(tabs)')
+    
+    console.log('Navigation State:', { session: !!session, segments, inAuthGroup, inTabsGroup })
 
     if (!session && !inAuthGroup) {
-      console.log('Redirecting to login...')
+      console.log('No session, redirecting to login...')
       router.replace('/(auth)/login')
-    } else if (session && inAuthGroup) {
-      console.log('Redirecting to dashboard...')
+    } else if (session && !inTabsGroup) {
+      console.log('Session found, redirecting to dashboard...')
       router.replace('/(tabs)')
     }
   }, [session, segments])
+
 
 
   return (
