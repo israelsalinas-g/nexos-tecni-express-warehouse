@@ -1,21 +1,38 @@
-import { useState, useEffect, useCallback } from 'react'
-import { View, StyleSheet, ActivityIndicator, TextInput } from 'react-native'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { 
+  View, StyleSheet, ActivityIndicator, TextInput, 
+  ScrollView, TouchableOpacity, Text 
+} from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { InventoryList } from '@/components/common/InventoryList'
+import { useRouter } from 'expo-router'
+import { ProductList } from '@/components/common/ProductList'
 import { InventoryService } from '@/services/inventory.service'
 import { InventoryRow } from '@/types/database.types'
 import { tokens } from '@/theme/tokens'
 
 export default function InventoryScreen() {
+  const router = useRouter()
   const [inventory, setInventory] = useState<InventoryRow[]>([])
-  const [loading, setLoading]     = useState(true)
+  const [brands, setBrands] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  
+  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [search, setSearch]       = useState('')
+  const [search, setSearch] = useState('')
+  
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
-  const fetchInventory = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const data = await InventoryService.getAll()
-      setInventory(data)
+      const [invData, brandData, catData] = await Promise.all([
+        InventoryService.getAll(),
+        InventoryService.getBrands(),
+        InventoryService.getCategories()
+      ])
+      setInventory(invData)
+      setBrands(brandData)
+      setCategories(catData)
     } catch (error) {
       console.error(error)
     } finally {
@@ -24,21 +41,60 @@ export default function InventoryScreen() {
     }
   }, [])
 
-  useEffect(() => { fetchInventory() }, [fetchInventory])
+  useEffect(() => { fetchData() }, [fetchData])
 
-  const filtered = inventory.filter((item) => 
-    item.products?.name_es?.toLowerCase().includes(search.toLowerCase()) ||
-    item.products?.sku?.toLowerCase().includes(search.toLowerCase())
-  )
+  // Group inventory by product
+  const groupedInventory = useMemo(() => {
+    const map = new Map<string, any>()
+
+    inventory.forEach((row) => {
+      if (!row.product_id) return
+      
+      const product = row.products
+      if (!product) return
+
+      // Apply Filters
+      const matchesSearch = !search || 
+        product.name_es?.toLowerCase().includes(search.toLowerCase()) ||
+        product.sku?.toLowerCase().includes(search.toLowerCase())
+      
+      const matchesBrand = !selectedBrand || product.brand_id === selectedBrand
+      const matchesCategory = !selectedCategory || product.category_id === selectedCategory
+
+      if (matchesSearch && matchesBrand && matchesCategory) {
+        if (!map.has(row.product_id)) {
+          map.set(row.product_id, {
+            productId: row.product_id,
+            name: product.name_es,
+            sku: product.sku,
+            brandName: product.brands?.name || 'Genérico',
+            categoryName: 'Repuestos', // Mock if not in joins, usually categories join needed
+            totalStock: 0,
+            warehouses: []
+          })
+        }
+
+        const grouped = map.get(row.product_id)
+        grouped.totalStock += row.quantity
+        grouped.warehouses.push({
+          name: row.warehouses?.name || 'Bodega',
+          code: row.warehouses?.code || 'N/A',
+          quantity: row.quantity
+        })
+      }
+    })
+
+    return Array.from(map.values())
+  }, [inventory, search, selectedBrand, selectedCategory])
 
   const onRefresh = () => {
     setRefreshing(true)
-    fetchInventory()
+    fetchData()
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchBox}>
+      <View style={styles.header}>
         <View style={styles.searchWrapper}>
           <MaterialCommunityIcons name="magnify" size={20} color={tokens.colors.gray400} />
           <TextInput
@@ -50,6 +106,46 @@ export default function InventoryScreen() {
             clearButtonMode="while-editing"
           />
         </View>
+
+        <View style={styles.filterSection}>
+          <Text style={styles.filterLabel}>Marcas</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
+            <TouchableOpacity 
+              style={[styles.chip, !selectedBrand && styles.chipActive]} 
+              onPress={() => setSelectedBrand(null)}
+            >
+              <Text style={[styles.chipText, !selectedBrand && styles.chipTextActive]}>Todas</Text>
+            </TouchableOpacity>
+            {brands.map((b) => (
+              <TouchableOpacity 
+                key={b.id} 
+                style={[styles.chip, selectedBrand === b.id && styles.chipActive]} 
+                onPress={() => setSelectedBrand(b.id)}
+              >
+                <Text style={[styles.chipText, selectedBrand === b.id && styles.chipTextActive]}>{b.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          <Text style={styles.filterLabel}>Categorías</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
+            <TouchableOpacity 
+              style={[styles.chip, !selectedCategory && styles.chipActiveSecondary]} 
+              onPress={() => setSelectedCategory(null)}
+            >
+              <Text style={[styles.chipText, !selectedCategory && styles.chipTextActive]}>Todas</Text>
+            </TouchableOpacity>
+            {categories.map((c) => (
+              <TouchableOpacity 
+                key={c.id} 
+                style={[styles.chip, selectedCategory === c.id && styles.chipActiveSecondary]} 
+                onPress={() => setSelectedCategory(c.id)}
+              >
+                <Text style={[styles.chipText, selectedCategory === c.id && styles.chipTextActive]}>{c.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </View>
 
       {loading && !refreshing ? (
@@ -57,15 +153,24 @@ export default function InventoryScreen() {
           <ActivityIndicator size="large" color={tokens.colors.primary} />
         </View>
       ) : (
-        <InventoryList 
-          data={filtered} 
+        <ProductList 
+          data={groupedInventory} 
           onRefresh={onRefresh} 
           refreshing={refreshing} 
           onItemPress={(item) => {
-            console.log('Pressed item:', item.products?.sku)
+            console.log('Pressed item:', item.sku)
           }}
         />
       )}
+
+      {/* FAB */}
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={() => console.log('Add product')}
+        activeOpacity={0.9}
+      >
+        <MaterialCommunityIcons name="plus" size={30} color="#fff" />
+      </TouchableOpacity>
     </View>
   )
 }
@@ -73,20 +178,23 @@ export default function InventoryScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  searchBox: { 
+  header: { 
     padding: tokens.spacing[4], 
     backgroundColor: tokens.colors.bgLight,
     borderBottomWidth: 1,
-    borderBottomColor: tokens.colors.gray200,
+    borderBottomColor: tokens.colors.gray100 + '30',
     ...tokens.shadow.sm,
   },
   searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: tokens.colors.gray100,
-    borderRadius: tokens.radius.lg,
-    paddingHorizontal: tokens.spacing[3],
+    backgroundColor: tokens.colors.gray50,
+    borderRadius: tokens.radius.xl,
+    paddingHorizontal: tokens.spacing[4],
     height: 48,
+    marginBottom: tokens.spacing[4],
+    borderWidth: 1,
+    borderColor: tokens.colors.gray200,
   },
   searchInput: {
     flex: 1,
@@ -94,4 +202,57 @@ const styles = StyleSheet.create({
     fontSize: tokens.typography.size.base,
     color: tokens.colors.gray900,
   },
+  filterSection: {
+    marginTop: 2,
+  },
+  filterLabel: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: tokens.colors.gray400,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: tokens.spacing[2],
+    marginLeft: 4,
+  },
+  chipScroll: {
+    marginBottom: tokens.spacing[4],
+  },
+  chip: {
+    paddingHorizontal: tokens.spacing[4],
+    paddingVertical: 6,
+    borderRadius: tokens.radius.full,
+    backgroundColor: tokens.colors.gray100,
+    marginRight: tokens.spacing[2],
+    borderWidth: 1,
+    borderColor: tokens.colors.gray200,
+  },
+  chipActive: {
+    backgroundColor: tokens.colors.primary,
+    borderColor: tokens.colors.primary,
+  },
+  chipActiveSecondary: {
+    backgroundColor: tokens.colors.secondary,
+    borderColor: tokens.colors.secondary,
+  },
+  chipText: {
+    fontSize: 12,
+    color: tokens.colors.gray600,
+    fontWeight: '600',
+  },
+  chipTextActive: {
+    color: '#fff',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: tokens.spacing[6],
+    right: tokens.spacing[6],
+    width: 60,
+    height: 60,
+    borderRadius: 18,
+    backgroundColor: tokens.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...tokens.shadow.lg,
+  },
 })
+

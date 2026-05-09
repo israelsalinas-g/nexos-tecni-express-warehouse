@@ -73,6 +73,31 @@ export class InventoryService {
   static async getStockByProduct(productId: string) {
     return this.getByProduct(productId)
   }
+
+  /**
+   * Fetches all brands
+   */
+  static async getBrands() {
+    const { data, error } = await supabase
+      .from('brands')
+      .select('*')
+      .order('name')
+    if (error) throw error
+    return data
+  }
+
+  /**
+   * Fetches all categories
+   */
+  static async getCategories() {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name')
+    if (error) throw error
+    return data
+  }
 }
+
 
 
