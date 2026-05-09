@@ -81,6 +81,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="auxiliaries"
+        options={{
+          title: 'Auxiliares',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="database-cog-outline" color={color} size={size} />
+          ),
+        }}
+      />
+
     </Tabs>
 
   )
