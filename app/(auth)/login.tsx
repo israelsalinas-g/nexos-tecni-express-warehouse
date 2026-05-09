@@ -34,7 +34,7 @@ export default function LoginScreen() {
       .eq('id', data.user.id)
       .single()
 
-    if (profileError || !profile?.is_admin || (profile.admin_role !== 'superadmin' && profile.admin_role !== 'warehouse')) {
+    if (profileError || !profile?.is_admin || (profile.admin_role !== 'superadmin' && profile.admin_role !== 'warehouse' && profile.admin_role !== 'sales')) {
       await supabase.auth.signOut()
       setLoading(false)
       Alert.alert(
