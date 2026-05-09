@@ -27,15 +27,14 @@ export default function LoginScreen() {
       return
     }
 
-    // Verify this user is a warehouse admin
+    // Verify this user is a warehouse admin or superadmin
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('role')
+      .select('is_admin, admin_role')
       .eq('id', data.user.id)
       .single()
 
-    // Assuming role 'staff' or similar has warehouse access
-    if (profileError || (profile?.role !== 'admin' && profile?.role !== 'staff')) {
+    if (profileError || !profile?.is_admin || (profile.admin_role !== 'superadmin' && profile.admin_role !== 'warehouse')) {
       await supabase.auth.signOut()
       setLoading(false)
       Alert.alert(
