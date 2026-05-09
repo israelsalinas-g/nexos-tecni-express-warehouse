@@ -31,11 +31,13 @@ export default function RootLayout() {
     if (!session && !inAuthGroup) {
       console.log('No session, redirecting to login...')
       router.replace('/(auth)/login')
-    } else if (session && !inTabsGroup) {
+    } else if (session && (inAuthGroup || !segments.length)) {
+
       console.log('Session found, redirecting to dashboard...')
       router.replace('/(tabs)')
     }
   }, [session, segments])
+
 
 
 

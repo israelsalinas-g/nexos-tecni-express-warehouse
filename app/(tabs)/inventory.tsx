@@ -173,7 +173,8 @@ export default function InventoryScreen() {
                   style={[styles.chip, selectedCategory === c.id && styles.chipActiveSecondary]} 
                   onPress={() => setSelectedCategory(c.id)}
                 >
-                  <Text style={[styles.chipText, selectedCategory === c.id && styles.chipTextActive]}>{c.name}</Text>
+                  <Text style={[styles.chipText, selectedCategory === c.id && styles.chipTextActive]}>{c.name_es || (c as any).name}</Text>
+
                 </TouchableOpacity>
               ))}
             </ScrollView>
