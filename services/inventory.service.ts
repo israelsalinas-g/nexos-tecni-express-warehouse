@@ -8,12 +8,18 @@ export class InventoryService {
   static async getAll(): Promise<InventoryRow[]> {
     const { data, error } = await supabase
       .from('inventory')
-      .select('*, products(*, brands(*)), warehouses(*)')
+      .select('*, products(*, brands(*), categories(*), product_images(url)), warehouses(*)')
+
+      .eq('products.product_images.is_primary', true)
       .order('quantity', { ascending: true })
 
     if (error) throw error
-    return data as InventoryRow[]
+    
+    // We need to handle the nested structure to flatten the image for the UI if needed
+    // but the current ProductList expects the image inside the product object.
+    return data as any[]
   }
+
 
   /**
    * Fetches inventory rows for a specific warehouse

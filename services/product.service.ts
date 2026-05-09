@@ -16,16 +16,25 @@ export class ProductService {
     return data
   }
 
-  static async getBySku(sku: string): Promise<Product | null> {
+  static async getBySku(sku: string): Promise<any | null> {
     const { data, error } = await supabase
       .from('products')
-      .select('*')
+      .select('*, product_images(url)')
       .eq('sku', sku)
+      .eq('product_images.is_primary', true)
       .single()
 
-    if (error) return null // Sku might not exist
-    return data
+    if (error || !data) return null
+    
+    // Flatten the primary image URL
+    const product = {
+      ...data,
+      main_image_url: data.product_images?.[0]?.url || null
+    }
+
+    return product
   }
+
 
   /**
    * Searches products by term

@@ -89,9 +89,11 @@ export default function InventoryScreen() {
             name: product.name_es,
             sku: product.sku,
             brandName: product.brands?.name || 'Genérico',
-            categoryName: 'Repuestos', // Mock if not in joins, usually categories join needed
+            categoryName: product.categories?.name_es || product.categories?.name || 'Repuestos',
+            imageUrl: product.product_images?.[0]?.url || null,
             totalStock: 0,
             warehouses: []
+
           })
         }
 

@@ -18,9 +18,12 @@ interface GroupedProduct {
     quantity: number
   }[]
   price?: number
+  imageUrl?: string | null
 }
 
+
 interface Props {
+
   data: GroupedProduct[]
   onRefresh?: () => void
   refreshing?: boolean
@@ -60,53 +63,68 @@ export const ProductList: React.FC<Props> = ({
         onPress={() => onItemPress?.(item)}
         activeOpacity={0.7}
       >
-        <View style={styles.cardHeader}>
-          <View style={styles.titleWrapper}>
-            <Text style={styles.skuText}>SKU: {item.sku}</Text>
-            <Text style={styles.productName} numberOfLines={2}>
-              {item.name}
-            </Text>
-          </View>
-          <View style={styles.brandBadge}>
-            {brandLogo ? (
-              <Image source={brandLogo} style={styles.brandLogo} resizeMode="contain" />
-            ) : (
-              <Text style={styles.brandText}>{item.brandName}</Text>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.detailsGrid}>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailLabel}>Categoría</Text>
-            <Text style={styles.detailValue}>{item.categoryName}</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailLabel}>Precio Sug.</Text>
-            <Text style={styles.detailValue}>L. 184.50</Text>
-          </View>
-        </View>
-
-        <View style={styles.warehouseSection}>
-          <Text style={styles.warehouseTitle}>Disponibilidad por Bodega:</Text>
-          {item.warehouses.map((wh, idx) => (
-            <View key={idx} style={styles.warehouseRow}>
-              <Text style={styles.warehouseName}>{wh.name} ({wh.code})</Text>
-              <Text style={[styles.warehouseQty, wh.quantity > 0 ? { color: tokens.colors.primary } : { color: tokens.colors.gray400 }]}>
-                {wh.quantity} und.
-              </Text>
+        <View style={styles.cardContent}>
+          {item.imageUrl ? (
+            <Image source={{ uri: item.imageUrl }} style={styles.thumbnail} />
+          ) : (
+            <View style={styles.thumbnailPlaceholder}>
+              <Text style={styles.placeholderChar}>{item.name.charAt(0)}</Text>
             </View>
-          ))}
-        </View>
+          )}
 
-        <View style={styles.cardFooter}>
-          <Text style={styles.priceText}>L. {item.price || '184.50'}</Text>
-          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-            <MaterialCommunityIcons name={statusIcon} size={14} color="#fff" />
-            <Text style={styles.statusText}>Total: {item.totalStock}</Text>
+          <View style={styles.mainInfo}>
+            <View style={styles.cardHeader}>
+              <View style={styles.titleWrapper}>
+                <Text style={styles.skuText}>SKU: {item.sku}</Text>
+                <Text style={styles.productName} numberOfLines={2}>
+                  {item.name}
+                </Text>
+              </View>
+              <View style={styles.brandBadge}>
+                {brandLogo ? (
+                  <Image source={brandLogo} style={styles.brandLogo} resizeMode="contain" />
+                ) : (
+                  <Text style={styles.brandText}>{item.brandName}</Text>
+                )}
+              </View>
+            </View>
+
+
+            <View style={styles.detailsGrid}>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Categoría</Text>
+                <Text style={styles.detailValue}>{item.categoryName}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Precio Sug.</Text>
+                <Text style={styles.detailValue}>L. 184.50</Text>
+              </View>
+            </View>
+
+            <View style={styles.warehouseSection}>
+              <Text style={styles.warehouseTitle}>Disponibilidad por Bodega:</Text>
+              {item.warehouses.map((wh, idx) => (
+                <View key={idx} style={styles.warehouseRow}>
+                  <Text style={styles.warehouseName}>{wh.name} ({wh.code})</Text>
+                  <Text style={[styles.warehouseQty, wh.quantity > 0 ? { color: tokens.colors.primary } : { color: tokens.colors.gray400 }]}>
+                    {wh.quantity} und.
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.cardFooter}>
+              <Text style={styles.priceText}>L. {item.price || '184.50'}</Text>
+              <View style={{ flex: 1 }} />
+              <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+                <MaterialCommunityIcons name={statusIcon} size={14} color="#fff" />
+                <Text style={styles.statusText}>Total: {item.totalStock}</Text>
+              </View>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
+
     )
   }
   const List = FlashList as any
@@ -134,13 +152,40 @@ const styles = StyleSheet.create({
   list: { padding: tokens.spacing[4], paddingBottom: 100 },
   card: {
     backgroundColor: tokens.colors.bgLight,
-    borderRadius: tokens.radius.xl,
+    borderRadius: 20,
     padding: tokens.spacing[4],
     marginBottom: tokens.spacing[4],
-    ...tokens.shadow.sm,
+    ...tokens.shadow.md,
   },
-  cardHeader: {
+  cardContent: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  thumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    backgroundColor: tokens.colors.gray50,
+  },
+  thumbnailPlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    backgroundColor: tokens.colors.gray100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderChar: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: tokens.colors.gray400,
+  },
+  mainInfo: {
+    flex: 1,
+    marginLeft: tokens.spacing[4],
+  },
+  cardHeader: { 
+    flexDirection: 'row', 
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: tokens.spacing[3],

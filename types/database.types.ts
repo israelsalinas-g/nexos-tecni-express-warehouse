@@ -27,10 +27,13 @@ export interface Warehouse {
 
 export interface Category {
   id: string
-  name: string
+  name?: string
+  name_es?: string
+  name_en?: string
   slug: string
   parent_id?: string | null
 }
+
 
 export interface Brand {
   id: string
@@ -52,7 +55,19 @@ export interface Product {
   created_at: string
   updated_at: string
   brands?: Brand
+  categories?: Category
+  product_images?: ProductImage[]
 }
+
+export interface ProductImage {
+  id: string
+  product_id: string
+  url: string
+  is_primary: boolean
+  sort_order: number
+}
+
+
 
 
 export interface Inventory {
