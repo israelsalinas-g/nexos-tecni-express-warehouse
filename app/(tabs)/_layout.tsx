@@ -1,9 +1,5 @@
 import { Tabs } from 'expo-router'
-import { Text } from 'react-native'
-
-function Icon({ label }: { label: string }) {
-  return <Text style={{ fontSize: 20 }}>{label}</Text>
-}
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 export default function TabLayout() {
   return (
@@ -11,40 +7,55 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#2563eb',
         tabBarInactiveTintColor: '#9ca3af',
-        tabBarStyle: { borderTopColor: '#e5e7eb' },
+        tabBarStyle: { 
+          borderTopColor: '#e5e7eb',
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
         headerStyle: { backgroundColor: '#fff' },
         headerTintColor: '#111827',
         headerShadowVisible: false,
+        headerTitleStyle: { fontWeight: '800' },
       }}
     >
       <Tabs.Screen
         name="scan"
         options={{
           title: 'Escanear',
-          tabBarIcon: ({ focused }) => <Icon label={focused ? '📷' : '📷'} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="barcode-scan" color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="inventory"
         options={{
           title: 'Inventario',
-          tabBarIcon: ({ focused }) => <Icon label={focused ? '📦' : '📦'} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="package-variant-closed" color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="orders"
         options={{
           title: 'Órdenes',
-          tabBarIcon: ({ focused }) => <Icon label={focused ? '🛍️' : '🛍️'} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="clipboard-text-outline" color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
         name="transfers"
         options={{
           title: 'Traslados',
-          tabBarIcon: ({ focused }) => <Icon label={focused ? '🔄' : '🔄'} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="swap-horizontal" color={color} size={size} />
+          ),
         }}
       />
     </Tabs>
   )
 }
+
