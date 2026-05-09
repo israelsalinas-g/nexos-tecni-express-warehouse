@@ -38,8 +38,17 @@ export default function AuxiliariesScreen() {
       icon: 'truck-delivery-outline',
       color: '#f59e0b', // Amber
       route: '/auxiliaries/suppliers'
+    },
+    {
+      id: 'warehouses',
+      title: 'Bodegas',
+      subtitle: 'Ubicaciones de inventario',
+      icon: 'warehouse',
+      color: '#ef4444', // Red
+      route: '/auxiliaries/warehouses'
     }
   ]
+
 
   return (
     <SafeAreaView style={styles.container}>
