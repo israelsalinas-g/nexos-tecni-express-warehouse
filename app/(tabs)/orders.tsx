@@ -196,7 +196,8 @@ const styles = StyleSheet.create({
   customer: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray600, marginLeft: tokens.spacing[1] },
   items: { borderTopWidth: 1, borderTopColor: tokens.colors.gray100, paddingTop: tokens.spacing[3], marginBottom: tokens.spacing[4] },
   item: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: tokens.spacing[1] },
-  itemName: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray700, flex: 1 },
+  itemName: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray600, flex: 1 },
+
   itemQty: { fontSize: tokens.typography.size.sm, fontWeight: tokens.typography.weight.bold, color: tokens.colors.primary },
   dispatchBtn: { 
     backgroundColor: tokens.colors.primary, 
