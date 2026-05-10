@@ -11,6 +11,17 @@ export class ProfileService {
     return data || []
   }
 
+  // Get only admins (users with application access)
+  static async getAdmins(): Promise<Profile[]> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('is_admin', true)
+      .order('full_name')
+    if (error) throw error
+    return data || []
+  }
+
   // Get only customers (non-admins)
   static async getCustomers(): Promise<Profile[]> {
     const { data, error } = await supabase
@@ -27,9 +38,7 @@ export class ProfileService {
       .from('profiles')
       .insert([{ 
         ...profile, 
-        id: crypto.randomUUID(), // Assuming environment supports it or polyfill
-        is_admin: false,
-        type_verified: false,
+        type_verified: profile.is_admin || false,
         preferred_language: 'es'
       }])
       .select()
@@ -38,11 +47,13 @@ export class ProfileService {
     return data
   }
 
-
   static async update(id: string, updates: Partial<Profile>): Promise<Profile> {
     const { data, error } = await supabase
       .from('profiles')
-      .update(updates)
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', id)
       .select()
       .single()
@@ -51,9 +62,6 @@ export class ProfileService {
   }
 
   static async delete(id: string): Promise<void> {
-    // Note: Deleting a profile usually requires deleting the auth user too,
-    // which normally requires admin privileges via supabase.auth.admin.deleteUser
-    // For now, we only delete from the profiles table (if possible/allowed)
     const { error } = await supabase
       .from('profiles')
       .delete()
