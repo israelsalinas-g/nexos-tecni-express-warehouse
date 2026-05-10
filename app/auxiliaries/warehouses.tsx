@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { 
   View, Text, StyleSheet, TouchableOpacity, FlatList, 
-  ActivityIndicator, Modal, TextInput, Alert, SafeAreaView,
+  ActivityIndicator, Modal, TextInput, Alert,
   Platform, KeyboardAvoidingView, Switch, ScrollView
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { tokens } from '@/theme/tokens'
