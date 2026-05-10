@@ -71,15 +71,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="orders"
+        name="sales"
         options={{
-          title: 'Órdenes',
+          title: 'Ventas',
           href: null,
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="clipboard-text-outline" color={color} size={size} />
+            <MaterialCommunityIcons name="cash-register" color={color} size={size} />
           ),
         }}
       />
+
       <Tabs.Screen
         name="purchases"
         options={{

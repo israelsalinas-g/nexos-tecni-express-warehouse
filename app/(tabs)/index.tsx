@@ -52,8 +52,9 @@ export default function HomeScreen() {
       subtitle: 'Facturación y POS', 
       icon: 'cash-register', 
       color: tokens.colors.success,
-      route: '/(tabs)/orders'
+      route: '/(tabs)/sales'
     },
+
     { 
       id: 'inventory', 
       title: 'Productos', 
