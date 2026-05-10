@@ -22,6 +22,23 @@ export class ProfileService {
     return data || []
   }
 
+  static async create(profile: Partial<Profile>): Promise<Profile> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert([{ 
+        ...profile, 
+        id: crypto.randomUUID(), // Assuming environment supports it or polyfill
+        is_admin: false,
+        type_verified: false,
+        preferred_language: 'es'
+      }])
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  }
+
+
   static async update(id: string, updates: Partial<Profile>): Promise<Profile> {
     const { data, error } = await supabase
       .from('profiles')

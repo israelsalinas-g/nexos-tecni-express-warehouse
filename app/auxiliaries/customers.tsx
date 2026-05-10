@@ -53,16 +53,28 @@ export default function CustomersScreen() {
     fetchCustomers()
   }
 
-  const handleOpenModal = (customer: Profile) => {
-    setEditingCustomer(customer)
-    setForm({
-      full_name: customer.full_name,
-      email: customer.email,
-      phone: customer.phone || '',
-      customer_type: customer.customer_type || 'public',
-      type_verified: customer.type_verified || false,
-      preferred_language: customer.preferred_language || 'es'
-    })
+  const handleOpenModal = (customer?: Profile) => {
+    if (customer) {
+      setEditingCustomer(customer)
+      setForm({
+        full_name: customer.full_name,
+        email: customer.email,
+        phone: customer.phone || '',
+        customer_type: customer.customer_type || 'public',
+        type_verified: customer.type_verified || false,
+        preferred_language: customer.preferred_language || 'es'
+      })
+    } else {
+      setEditingCustomer(null)
+      setForm({
+        full_name: '',
+        email: '',
+        phone: '',
+        customer_type: 'public',
+        type_verified: false,
+        preferred_language: 'es'
+      })
+    }
     setModalVisible(true)
   }
 
@@ -71,16 +83,22 @@ export default function CustomersScreen() {
       Alert.alert('Error', 'El nombre es obligatorio.')
       return
     }
+    if (!form.email.trim()) {
+      Alert.alert('Error', 'El correo es obligatorio.')
+      return
+    }
 
     try {
       setSubmitting(true)
       if (editingCustomer) {
         await ProfileService.update(editingCustomer.id, form)
-        setModalVisible(false)
-        fetchCustomers()
+      } else {
+        await ProfileService.create(form)
       }
+      setModalVisible(false)
+      fetchCustomers()
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo actualizar el cliente.')
+      Alert.alert('Error', error.message || 'No se pudo guardar el cliente.')
     } finally {
       setSubmitting(false)
     }
@@ -101,8 +119,11 @@ export default function CustomersScreen() {
           <MaterialCommunityIcons name="chevron-left" size={28} color={tokens.colors.gray900} />
         </TouchableOpacity>
         <Text style={styles.title}>Clientes</Text>
-        <View style={{ width: 40 }} />
+        <TouchableOpacity style={styles.addButton} onPress={() => handleOpenModal()}>
+          <MaterialCommunityIcons name="plus" size={24} color={tokens.colors.primary} />
+        </TouchableOpacity>
       </View>
+
 
       <FlatList
         data={customers}
@@ -183,13 +204,17 @@ export default function CustomersScreen() {
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Correo Electrónico (No editable)</Text>
+                  <Text style={styles.label}>Correo Electrónico {!editingCustomer && '*'}</Text>
                   <TextInput
-                    style={[styles.input, { opacity: 0.6 }]}
+                    style={[styles.input, editingCustomer && { opacity: 0.6 }]}
                     value={form.email}
-                    editable={false}
+                    onChangeText={(val) => setForm({...form, email: val})}
+                    editable={!editingCustomer}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
                   />
                 </View>
+
 
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>Teléfono</Text>
@@ -292,7 +317,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: tokens.colors.gray900,
   },
+  addButton: {
+    padding: 8,
+    backgroundColor: tokens.colors.primary + '10',
+    borderRadius: 12,
+  },
   list: {
+
     padding: 16,
     paddingBottom: 40,
   },
