@@ -58,8 +58,16 @@ export default function AuxiliariesScreen() {
       icon: 'file-certificate-outline',
       color: '#f43f5e', // Rose
       route: '/auxiliaries/fiscal'
+    },
+    {
+      id: 'company',
+      title: 'Datos Empresa',
+      icon: 'office-building-cog-outline',
+      color: '#0ea5e9', // Sky
+      route: '/auxiliaries/company'
     }
   ]
+
 
 
   return (

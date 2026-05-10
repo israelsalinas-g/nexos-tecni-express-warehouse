@@ -231,7 +231,24 @@ export interface InvoiceAuthRange {
   created_at: string
 }
 
+export interface CompanyProfile {
+  id: string
+  business_name: string
+  rtn: string
+  address: string
+  phone: string
+  email: string
+  website?: string
+  logo_url?: string
+  legal_representative: string
+  legal_rep_position: string
+  legal_rep_phone?: string
+  legal_rep_email?: string
+  updated_at: string
+}
+
 // UI / Business Logic Wrappers
+
 
 
 export interface InventoryRow extends Inventory {
