@@ -64,10 +64,8 @@ export default function AuxiliariesScreen() {
               key={item.id}
               style={styles.card}
               activeOpacity={0.7}
-              onPress={() => {
-                // For now, just show a message since we haven't built the CRUDs yet
-                console.log(`Navigating to ${item.route}`)
-              }}
+              onPress={() => router.push(item.route as any)}
+
             >
               <View style={[styles.iconContainer, { backgroundColor: item.color + '15' }]}>
                 <MaterialCommunityIcons name={item.icon as any} size={32} color={item.color} />
