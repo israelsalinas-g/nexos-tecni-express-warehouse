@@ -1,32 +1,18 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Dimensions } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { tokens } from '@/theme/tokens'
 import { useRouter } from 'expo-router'
+
+const { width } = Dimensions.get('window')
+const COLUMN_WIDTH = (width - 40 - 16) / 2 // 40 (padding horizontal) - 16 (gap)
 
 export default function AuxiliariesScreen() {
   const router = useRouter()
 
   const menuItems = [
     {
-      id: 'brands',
-      title: 'Marcas',
-      subtitle: 'Gestión de fabricantes',
-      icon: 'tag-multiple-outline',
-      color: '#3b82f6', // Blue
-      route: '/auxiliaries/brands'
-    },
-    {
-      id: 'categories',
-      title: 'Categorías',
-      subtitle: 'Organización de productos',
-      icon: 'shape-outline',
-      color: '#8b5cf6', // Violet
-      route: '/auxiliaries/categories'
-    },
-    {
       id: 'customers',
       title: 'Clientes',
-      subtitle: 'Directorio de compradores',
       icon: 'account-group-outline',
       color: '#10b981', // Emerald
       route: '/auxiliaries/customers'
@@ -34,52 +20,64 @@ export default function AuxiliariesScreen() {
     {
       id: 'suppliers',
       title: 'Proveedores',
-      subtitle: 'Gestión de suministros',
       icon: 'truck-delivery-outline',
       color: '#f59e0b', // Amber
       route: '/auxiliaries/suppliers'
     },
     {
+      id: 'brands',
+      title: 'Marcas',
+      icon: 'tag-multiple-outline',
+      color: '#3b82f6', // Blue
+      route: '/auxiliaries/brands'
+    },
+    {
+      id: 'categories',
+      title: 'Categorías',
+      icon: 'shape-outline',
+      color: '#8b5cf6', // Violet
+      route: '/auxiliaries/categories'
+    },
+    {
       id: 'warehouses',
       title: 'Bodegas',
-      subtitle: 'Ubicaciones de inventario',
       icon: 'warehouse',
       color: '#ef4444', // Red
       route: '/auxiliaries/warehouses'
+    },
+    {
+      id: 'users',
+      title: 'Usuarios',
+      icon: 'shield-account-outline',
+      color: '#6366f1', // Indigo
+      route: '/auxiliaries/users' // Placeholder route
     }
   ]
-
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.title}>Auxiliares</Text>
-          <Text style={styles.subtitle}>Panel de gestión de datos maestros</Text>
+          <Text style={styles.subtitle}>Gestión de datos maestros</Text>
         </View>
 
         <View style={styles.grid}>
           {menuItems.map((item) => (
             <TouchableOpacity 
               key={item.id}
-              style={styles.card}
+              style={styles.squareCard}
               activeOpacity={0.7}
               onPress={() => router.push(item.route as any)}
-
             >
-              <View style={[styles.iconContainer, { backgroundColor: item.color + '15' }]}>
+              <View style={[styles.iconCircle, { backgroundColor: item.color + '15' }]}>
                 <MaterialCommunityIcons name={item.icon as any} size={32} color={item.color} />
               </View>
-              <View style={styles.cardInfo}>
-                <Text style={styles.cardTitle}>{item.title}</Text>
-                <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
-              </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={tokens.colors.gray400} />
+              <Text style={styles.cardTitle}>{item.title}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Quick Stats / Info Section */}
         <View style={styles.infoBox}>
           <MaterialCommunityIcons name="information-outline" size={20} color={tokens.colors.primary} />
           <Text style={styles.infoText}>
@@ -103,6 +101,7 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 32,
     marginTop: 10,
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
@@ -116,39 +115,37 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   grid: {
-    gap: 16,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 20,
     flexDirection: 'row',
-    alignItems: 'center',
-    ...tokens.shadow.sm,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  iconContainer: {
+  squareCard: {
+    width: COLUMN_WIDTH,
+    height: COLUMN_WIDTH,
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    ...tokens.shadow.md,
+  },
+  iconCircle: {
     width: 64,
     height: 64,
-    borderRadius: 16,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  cardInfo: {
-    flex: 1,
-    marginLeft: 16,
+    marginBottom: 12,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
     color: tokens.colors.gray900,
-  },
-  cardSubtitle: {
-    fontSize: 13,
-    color: tokens.colors.gray400,
-    marginTop: 2,
+    textAlign: 'center',
   },
   infoBox: {
-    marginTop: 40,
+    marginTop: 24,
     backgroundColor: tokens.colors.primary + '08',
     padding: 20,
     borderRadius: 16,
@@ -165,3 +162,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   }
 })
+
