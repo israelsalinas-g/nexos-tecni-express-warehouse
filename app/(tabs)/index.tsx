@@ -47,12 +47,12 @@ export default function HomeScreen() {
 
   const menuItems = [
     { 
-      id: 'scan', 
-      title: 'Escanear', 
-      subtitle: 'Entradas y Salidas', 
-      icon: 'barcode-scan', 
+      id: 'auxiliaries', 
+      title: 'Auxiliares', 
+      subtitle: 'Maestros y CRUDs', 
+      icon: 'database-cog-outline', 
       color: tokens.colors.primary,
-      route: '/(tabs)/scan'
+      route: '/(tabs)/auxiliaries'
     },
     { 
       id: 'inventory', 

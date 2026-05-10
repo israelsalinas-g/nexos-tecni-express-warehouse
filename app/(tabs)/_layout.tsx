@@ -55,7 +55,6 @@ export default function TabLayout() {
         name="scan"
         options={{
           title: 'Escanear',
-          href: null, // Hide from tab bar
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="barcode-scan" color={color} size={size} />
           ),
@@ -84,6 +83,7 @@ export default function TabLayout() {
         name="transfers"
         options={{
           title: 'Traslados',
+          href: null, // Hide from tab bar
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="swap-horizontal" color={color} size={size} />
           ),
