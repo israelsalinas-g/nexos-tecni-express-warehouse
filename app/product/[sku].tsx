@@ -52,8 +52,10 @@ export default function ProductDetailScreen() {
 
   const handleShare = async () => {
     try {
-      const baseUrl = process.env.EXPO_PUBLIC_STOREFRONT_URL || 'https://nexostecniexpress.com/products'
-      const storefrontUrl = `${baseUrl}/${product?.slug}`
+      const baseUrl = process.env.EXPO_PUBLIC_STOREFRONT_URL;
+      const storefrontUrl = `${baseUrl}/${product?.slug}`;
+      console.log('Sharing URL:', storefrontUrl);
+      
       const message = `
 📦 *${product.name_es}*
 SKU: ${product.sku}
