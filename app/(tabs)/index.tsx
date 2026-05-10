@@ -47,6 +47,22 @@ export default function HomeScreen() {
 
   const menuItems = [
     { 
+      id: 'sales', 
+      title: 'Ventas', 
+      subtitle: 'Facturación y POS', 
+      icon: 'cash-register', 
+      color: tokens.colors.success,
+      route: '/(tabs)/orders'
+    },
+    { 
+      id: 'inventory', 
+      title: 'Productos', 
+      subtitle: 'Consultar Stock', 
+      icon: 'package-variant-closed', 
+      color: tokens.colors.info,
+      route: '/(tabs)/inventory'
+    },
+    { 
       id: 'auxiliaries', 
       title: 'Auxiliares', 
       subtitle: 'Maestros y CRUDs', 
@@ -55,38 +71,15 @@ export default function HomeScreen() {
       route: '/(tabs)/auxiliaries'
     },
     { 
-      id: 'inventory', 
-      title: 'Inventario', 
-      subtitle: 'Consultar Stock', 
-      icon: 'package-variant-closed', 
-      color: tokens.colors.info,
-      route: '/(tabs)/inventory'
-    },
-    { 
-      id: 'orders', 
-      title: 'Órdenes', 
-      subtitle: 'Despacho y Picking', 
-      icon: 'clipboard-text-outline', 
-      color: tokens.colors.warning,
-      route: '/(tabs)/orders'
-    },
-    { 
-      id: 'purchases', 
-      title: 'Compras', 
-      subtitle: 'Órdenes de Compra', 
-      icon: 'cart-outline', 
-      color: '#8b5cf6', // Violet
-      route: '/(tabs)/purchases'
-    },
-    { 
-      id: 'transfers', 
-      title: 'Traslados', 
-      subtitle: 'Movimiento Interno', 
-      icon: 'swap-horizontal', 
+      id: 'movements', 
+      title: 'Movimientos', 
+      subtitle: 'Compras y Traslados', 
+      icon: 'swap-horizontal-bold', 
       color: tokens.colors.secondary,
-      route: '/(tabs)/transfers'
+      route: '/(tabs)/movements'
     }
   ]
+
 
 
   return (

@@ -84,11 +84,22 @@ export default function TabLayout() {
         name="purchases"
         options={{
           title: 'Compras',
+          href: null,
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="cart-outline" color={color} size={size} />
           ),
         }}
       />
+      <Tabs.Screen
+        name="movements"
+        options={{
+          title: 'Movimientos',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="swap-horizontal-bold" color={color} size={size} />
+          ),
+        }}
+      />
+
 
       <Tabs.Screen
         name="transfers"
