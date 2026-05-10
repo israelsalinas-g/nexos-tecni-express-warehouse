@@ -20,7 +20,6 @@ export default function CategoriesScreen() {
   const [modalVisible, setModalVisible] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [nameEs, setNameEs] = useState('')
-  const [nameEn, setNameEn] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   const fetchCategories = useCallback(async () => {
@@ -49,27 +48,25 @@ export default function CategoriesScreen() {
     if (category) {
       setEditingCategory(category)
       setNameEs(category.name_es || '')
-      setNameEn(category.name_en || '')
     } else {
       setEditingCategory(null)
       setNameEs('')
-      setNameEn('')
     }
     setModalVisible(true)
   }
 
   const handleSave = async () => {
     if (!nameEs.trim()) {
-      Alert.alert('Error', 'El nombre en español es obligatorio.')
+      Alert.alert('Error', 'El nombre de la categoría es obligatorio.')
       return
     }
 
     try {
       setSubmitting(true)
       if (editingCategory) {
-        await CategoryService.update(editingCategory.id, nameEs, nameEn)
+        await CategoryService.update(editingCategory.id, nameEs)
       } else {
-        await CategoryService.create(nameEs, nameEn)
+        await CategoryService.create(nameEs)
       }
       setModalVisible(false)
       fetchCategories()
@@ -79,6 +76,7 @@ export default function CategoriesScreen() {
       setSubmitting(false)
     }
   }
+
 
   const handleDelete = (id: string) => {
     Alert.alert(
@@ -177,7 +175,7 @@ export default function CategoriesScreen() {
 
             <View style={styles.form}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Nombre (Español)</Text>
+                <Text style={styles.label}>Nombre de la Categoría</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Ej. Tarjetas Electrónicas"
@@ -186,17 +184,8 @@ export default function CategoriesScreen() {
                   autoFocus
                 />
               </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Nombre (Inglés) - Opcional</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ej. Electronic Boards"
-                  value={nameEn}
-                  onChangeText={setNameEn}
-                />
-              </View>
             </View>
+
 
             <TouchableOpacity 
               style={[styles.saveBtn, submitting && styles.btnDisabled]} 
