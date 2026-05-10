@@ -4,7 +4,7 @@ import {
   TouchableOpacity, ActivityIndicator, Alert, SafeAreaView,
   KeyboardAvoidingView, Platform, Image, Modal, FlatList
 } from 'react-native'
-import { useRouter } from 'expo-router'
+import { useRouter, useLocalSearchParams } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { tokens } from '@/theme/tokens'
 import { InventoryService } from '@/services/inventory.service'
@@ -15,9 +15,13 @@ interface SelectorItem {
   name: string
 }
 
-export default function NewProductScreen() {
+export default function ProductFormScreen() {
   const router = useRouter()
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const isEditing = !!id
+
   const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(isEditing)
   
   // Data for selectors
   const [brands, setBrands] = useState<any[]>([])
@@ -41,19 +45,48 @@ export default function NewProductScreen() {
   })
 
   useEffect(() => {
-    loadSelectors()
+    loadInitialData()
   }, [])
 
-  async function loadSelectors() {
+  async function loadInitialData() {
     try {
+      setFetching(true)
       const [b, c] = await Promise.all([
         InventoryService.getBrands(),
         InventoryService.getCategories()
       ])
       setBrands(b)
       setCategories(c)
+
+      if (isEditing) {
+        // Load product for editing
+        const product = await ProductService.getById(id)
+        if (product) {
+          setForm({
+            name_es: product.name_es,
+            sku: product.sku,
+            base_price: product.base_price?.toString() || '',
+            brand_id: product.brand_id || '',
+            category_id: product.category_id || '',
+            initial_stock: '0', // Stock isn't usually edited directly here in this schema
+            description_es: product.description_es || ''
+          })
+        }
+      } else {
+        // Set defaults for NEW product
+        const defaultBrand = b.find(item => item.name.toLowerCase().includes('otra'))
+        const defaultCat = c.find(item => item.name_es?.toLowerCase().includes('otro'))
+        
+        setForm(prev => ({
+          ...prev,
+          brand_id: defaultBrand?.id || '',
+          category_id: defaultCat?.id || ''
+        }))
+      }
     } catch (error) {
-      console.error('Error loading selectors:', error)
+      console.error('Error loading initial data:', error)
+    } finally {
+      setFetching(false)
     }
   }
 
@@ -87,24 +120,42 @@ export default function NewProductScreen() {
     try {
       setLoading(true)
       
-      const newProduct = await ProductService.create({
+      const payload = {
         name_es: form.name_es,
         sku: form.sku,
         base_price: parseFloat(form.base_price),
         brand_id: form.brand_id,
         category_id: form.category_id,
         description_es: form.description_es
-      })
+      }
 
-      Alert.alert('Éxito', 'Producto creado correctamente.', [
-        { text: 'OK', onPress: () => router.back() }
-      ])
+      if (isEditing) {
+        await ProductService.update(id, payload)
+        Alert.alert('Éxito', 'Producto actualizado correctamente.', [
+          { text: 'OK', onPress: () => router.back() }
+        ])
+      } else {
+        await ProductService.create(payload)
+        Alert.alert('Éxito', 'Producto creado correctamente.', [
+          { text: 'OK', onPress: () => router.back() }
+        ])
+      }
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo crear el producto.')
+      Alert.alert('Error', error.message || 'No se pudo guardar el producto.')
     } finally {
       setLoading(false)
     }
   }
+
+  if (fetching) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={tokens.colors.primary} />
+        <Text style={styles.fetchingText}>Cargando datos...</Text>
+      </View>
+    )
+  }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -116,7 +167,8 @@ export default function NewProductScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <MaterialCommunityIcons name="chevron-left" size={28} color={tokens.colors.gray900} />
           </TouchableOpacity>
-          <Text style={styles.title}>Nuevo Producto</Text>
+          <Text style={styles.title}>{isEditing ? 'Editar Producto' : 'Nuevo Producto'}</Text>
+
           <View style={{ width: 40 }} /> 
         </View>
 
@@ -299,6 +351,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  fetchingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: tokens.colors.gray400,
+    fontWeight: '500',
+  },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

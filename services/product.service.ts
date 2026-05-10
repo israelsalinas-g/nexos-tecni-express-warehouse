@@ -66,5 +66,29 @@ export class ProductService {
     if (error) throw error
     return data
   }
+
+  /**
+   * Updates an existing product
+   */
+  static async update(id: string, product: Partial<Product>): Promise<Product> {
+    const updates: any = { ...product }
+    
+    if (product.name_es) {
+      updates.slug = product.name_es.toLowerCase()
+        .replace(/ /g, '-')
+        .replace(/[^\w-]+/g, '')
+    }
+
+    const { data, error } = await supabase
+      .from('products')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
 }
+
 
