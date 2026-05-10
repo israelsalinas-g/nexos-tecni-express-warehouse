@@ -38,8 +38,10 @@ export interface Category {
 export interface Brand {
   id: string
   name: string
+  slug: string
   logo_url?: string
 }
+
 
 export interface Product {
   id: string
