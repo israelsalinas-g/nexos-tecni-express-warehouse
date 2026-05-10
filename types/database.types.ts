@@ -183,7 +183,7 @@ export interface Order {
   payment_method?: string
   subtotal: number
   tax_amount: number // 15% ISV
-  total_amount: number
+  total: number
   notes?: string
   created_at: string
   updated_at: string
@@ -195,7 +195,7 @@ export interface OrderItem {
   order_id: string
   product_id: string
   product_name_es?: string
-  sku?: string
+  product_sku?: string
   quantity: number
   unit_price: number
   subtotal: number
@@ -210,7 +210,7 @@ export interface Invoice {
   auth_range_id: string
   subtotal: number
   tax_amount: number
-  total_amount: number
+  total: number
   status: 'active' | 'voided'
   created_at: string
   updated_at: string

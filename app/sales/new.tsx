@@ -99,19 +99,19 @@ export default function NewSaleScreen() {
     try {
       const subtotal = calculateSubtotal()
       const tax_amount = calculateTax()
-      const total_amount = calculateTotal()
+      const total = calculateTotal()
 
       await OrderService.createSale({
         customer_id: selectedCustomer.id,
         subtotal,
         tax_amount,
-        total_amount,
+        total,
         payment_method: paymentMethod,
-        payment_status: 'unpaid' // confirmed manually later
+        payment_status: 'unpaid'
       }, items.map(i => ({
         product_id: i.product.id,
         product_name_es: i.product.name_es,
-        sku: i.product.sku,
+        product_sku: i.product.sku,
         quantity: i.quantity,
         unit_price: i.price,
         subtotal: i.quantity * i.price

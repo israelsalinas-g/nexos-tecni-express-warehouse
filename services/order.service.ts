@@ -11,7 +11,7 @@ export class OrderService {
       .select(`
         *,
         profiles(full_name, phone),
-        order_items(product_name_es, sku, quantity, unit_price, subtotal)
+        order_items(product_name_es, product_sku, quantity, unit_price, subtotal)
       `)
       .eq('status', 'pending')
       .order('created_at', { ascending: true })

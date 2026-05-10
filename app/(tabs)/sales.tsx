@@ -104,7 +104,7 @@ export default function SalesScreen() {
       <View style={styles.footer}>
         <View style={styles.totalBox}>
           <Text style={styles.totalLabel}>Total (incl. 15% ISV)</Text>
-          <Text style={styles.totalValue}>L. {item.total_amount?.toFixed(2)}</Text>
+          <Text style={styles.totalValue}>L. {item.total?.toFixed(2)}</Text>
         </View>
         
         {item.payment_status !== 'paid' && (
