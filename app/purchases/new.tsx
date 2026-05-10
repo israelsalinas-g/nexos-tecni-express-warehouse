@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { 
   View, Text, StyleSheet, TouchableOpacity, 
   ScrollView, Alert, ActivityIndicator, Modal, FlatList,
-  SafeAreaView, KeyboardAvoidingView, Platform, TextInput
+  SafeAreaView, KeyboardAvoidingView, Platform, TextInput,
+  Image
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -198,7 +199,16 @@ export default function NewPurchaseOrderScreen() {
               items.map((item, index) => (
                 <View key={item.product.id} style={styles.itemCard}>
                   <View style={styles.itemHeader}>
-                    <View style={{ flex: 1 }}>
+                    <View style={styles.productThumbContainer}>
+                      {item.product.product_images?.[0]?.url ? (
+                        <Image source={{ uri: item.product.product_images[0].url }} style={styles.productThumb} />
+                      ) : (
+                        <View style={styles.productThumbPlaceholder}>
+                          <MaterialCommunityIcons name="image-outline" size={20} color={tokens.colors.gray400} />
+                        </View>
+                      )}
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
                       <Text style={styles.itemName}>{item.product.name_es}</Text>
                       <Text style={styles.itemSku}>{item.product.sku}</Text>
                     </View>
@@ -287,12 +297,25 @@ export default function NewPurchaseOrderScreen() {
                       if (modalType !== 'product') setModalType(null)
                     }}
                   >
-                    <View>
-                      <Text style={styles.modalItemTitle}>{item.name || item.name_es}</Text>
-                      <Text style={styles.modalItemSub}>
-                        {modalType === 'product' ? item.sku : 
-                         modalType === 'supplier' ? item.city || 'N/A' : item.code}
-                      </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      {modalType === 'product' && (
+                        <View style={[styles.productThumbContainer, { marginRight: 12 }]}>
+                          {item.product_images?.[0]?.url ? (
+                            <Image source={{ uri: item.product_images[0].url }} style={styles.productThumb} />
+                          ) : (
+                            <View style={styles.productThumbPlaceholder}>
+                              <MaterialCommunityIcons name="image-outline" size={20} color={tokens.colors.gray400} />
+                            </View>
+                          )}
+                        </View>
+                      )}
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalItemTitle}>{item.name || item.name_es}</Text>
+                        <Text style={styles.modalItemSub}>
+                          {modalType === 'product' ? item.sku : 
+                           modalType === 'supplier' ? item.city || 'N/A' : item.code}
+                        </Text>
+                      </View>
                     </View>
 
                     <MaterialCommunityIcons name="chevron-right" size={20} color={tokens.colors.gray200} />
@@ -462,4 +485,25 @@ const styles = StyleSheet.create({
   modalItemTitle: { fontSize: 16, fontWeight: '600', color: tokens.colors.gray900 },
   modalItemSub: { fontSize: 12, color: tokens.colors.gray400, marginTop: 2 },
   noResults: { textAlign: 'center', marginTop: 40, color: tokens.colors.gray400 },
+  productThumbContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: tokens.colors.gray50,
+  },
+  productThumb: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  productThumbPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: tokens.colors.gray100,
+    borderRadius: 8,
+  },
 })

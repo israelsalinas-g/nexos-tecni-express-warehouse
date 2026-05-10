@@ -42,7 +42,7 @@ export class ProductService {
   static async search(term: string): Promise<Product[]> {
     const { data, error } = await supabase
       .from('products')
-      .select('*')
+      .select('*, product_images(url, is_primary)')
       .or(`name_es.ilike.%${term}%,sku.ilike.%${term}%`)
       .limit(20)
 
