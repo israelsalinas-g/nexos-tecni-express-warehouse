@@ -16,7 +16,6 @@ export class ProfileService {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('is_admin', true)
       .order('full_name')
     if (error) throw error
     return data || []
