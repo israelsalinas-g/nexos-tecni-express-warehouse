@@ -41,28 +41,51 @@ export default function UsersScreen() {
     fetchUsers()
   }, [])
 
+  const handleAdd = () => {
+    setEditingUser({
+      full_name: '',
+      email: '',
+      is_admin: true,
+      admin_role: 'sales'
+    })
+    setModalVisible(true)
+  }
+
   const handleEdit = (user: Profile) => {
     setEditingUser(user)
     setModalVisible(true)
   }
 
   const handleSave = async () => {
-    if (!editingUser?.id) return
+    if (!editingUser?.full_name || !editingUser?.email) {
+      Alert.alert('Error', 'Nombre y Email son obligatorios')
+      return
+    }
     
     try {
       setSaving(true)
-      await ProfileService.update(editingUser.id, {
-        admin_role: editingUser.admin_role,
-        is_admin: editingUser.is_admin,
-        full_name: editingUser.full_name
-      })
+      if (editingUser.id) {
+        // Update
+        await ProfileService.update(editingUser.id, {
+          admin_role: editingUser.admin_role,
+          is_admin: editingUser.is_admin,
+          full_name: editingUser.full_name
+        })
+        Alert.alert('Éxito', 'Usuario actualizado correctamente')
+      } else {
+        // Create
+        await ProfileService.create({
+          ...editingUser as any,
+          customer_type: 'public'
+        })
+        Alert.alert('Éxito', 'Perfil de usuario creado correctamente. Recuerde que el acceso requiere registro en Auth.')
+      }
       
-      Alert.alert('Éxito', 'Usuario actualizado correctamente')
       setModalVisible(false)
       fetchUsers()
     } catch (error) {
       console.error(error)
-      Alert.alert('Error', 'No se pudo actualizar el usuario')
+      Alert.alert('Error', 'No se pudo guardar el usuario')
     } finally {
       setSaving(false)
     }
@@ -82,10 +105,13 @@ export default function UsersScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
         </TouchableOpacity>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.title}>Usuarios</Text>
           <Text style={styles.subtitle}>Gestión de accesos y roles</Text>
         </View>
+        <TouchableOpacity onPress={handleAdd} style={styles.addBtnHeader}>
+          <MaterialCommunityIcons name="plus" size={24} color={tokens.colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {loading ? (
@@ -132,7 +158,7 @@ export default function UsersScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Editar Usuario</Text>
+              <Text style={styles.modalTitle}>{editingUser?.id ? 'Editar Usuario' : 'Nuevo Usuario'}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <MaterialCommunityIcons name="close" size={24} color={tokens.colors.gray400} />
               </TouchableOpacity>
@@ -149,12 +175,17 @@ export default function UsersScreen() {
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Email (Solo lectura)</Text>
+                <Text style={styles.label}>Email</Text>
                 <TextInput 
-                  style={[styles.input, { backgroundColor: tokens.colors.gray50, color: tokens.colors.gray400 }]}
+                  style={[styles.input, editingUser?.id && { backgroundColor: tokens.colors.gray50, color: tokens.colors.gray400 }]}
                   value={editingUser?.email}
-                  editable={false}
+                  placeholder="usuario@empresa.com"
+                  editable={!editingUser?.id}
+                  onChangeText={(text) => setEditingUser(prev => ({ ...prev!, email: text }))}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
                 />
+                {!editingUser?.id && <Text style={styles.inputHint}>El email debe coincidir con su cuenta de acceso.</Text>}
               </View>
 
               <View style={styles.field}>
@@ -322,5 +353,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 40
   },
-  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' }
+  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  addBtnHeader: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: tokens.colors.primary + '10',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  inputHint: { fontSize: 11, color: tokens.colors.gray400, marginTop: 4, fontStyle: 'italic' }
 })

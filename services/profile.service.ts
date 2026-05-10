@@ -37,6 +37,7 @@ export class ProfileService {
     const { data, error } = await supabase
       .from('profiles')
       .insert([{ 
+        id: profile.id || (global.crypto ? global.crypto.randomUUID() : Math.random().toString(36).substring(2)),
         ...profile, 
         type_verified: profile.is_admin || false,
         preferred_language: 'es'
