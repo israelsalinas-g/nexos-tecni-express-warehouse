@@ -62,7 +62,7 @@ SKU: ${product.sku}
 ${product.description_es ? `\n📝 ${product.description_es}\n` : ''}
 🏷️ Marca: ${product.brands?.name || 'N/A'}
 🗂️ Categoría: ${product.categories?.name_es || 'N/A'}
-💰 Precio: L. ${product.base_price?.toFixed(2)}
+💰 Precio: L. ${product.price_public?.toFixed(2)}
 📉 Stock Total: ${totalStock} unidades
 
 🔗 Ver producto: ${storefrontUrl}
@@ -145,7 +145,7 @@ ${product.description_es ? `\n📝 ${product.description_es}\n` : ''}
             </View>
             <View style={styles.priceTag}>
               <Text style={styles.priceLabel}>Precio Sugerido</Text>
-              <Text style={styles.priceValue}>L. {product.base_price?.toFixed(2)}</Text>
+              <Text style={styles.priceValue}>L. {product.price_public?.toFixed(2)}</Text>
 
             </View>
           </View>

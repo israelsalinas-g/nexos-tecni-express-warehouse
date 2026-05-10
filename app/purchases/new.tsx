@@ -72,7 +72,7 @@ export default function NewPurchaseOrderScreen() {
       Alert.alert('Aviso', 'Este producto ya está en la lista.')
       return
     }
-    setItems([...items, { product, quantity: 1, price: product.base_price || 0 }])
+    setItems([...items, { product, quantity: 1, price: product.price_public || 0 }])
     setModalType(null)
     setSearchTerm('')
     setSearchResults([])

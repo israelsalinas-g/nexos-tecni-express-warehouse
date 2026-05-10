@@ -136,7 +136,7 @@ export default function DashboardScreen() {
                   {item.quantity === 0 ? 'SIN STOCK' : `${item.quantity} UNIDADES`}
                 </Text>
               </View>
-              <Text style={styles.priceText}>L. {item.products?.base_price?.toFixed(2)}</Text>
+              <Text style={styles.priceText}>L. {item.products?.price_public?.toFixed(2)}</Text>
             </View>
           </View>
         )) : (

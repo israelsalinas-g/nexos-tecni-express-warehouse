@@ -37,7 +37,7 @@ export default function ProductFormScreen() {
   const [form, setForm] = useState({
     name_es: '',
     sku: '',
-    base_price: '',
+    price_public: '',
     brand_id: '',
     category_id: '',
     initial_stock: '0',
@@ -65,7 +65,7 @@ export default function ProductFormScreen() {
           setForm({
             name_es: product.name_es,
             sku: product.sku,
-            base_price: product.base_price?.toString() || '',
+            price_public: product.price_public?.toString() || '',
             brand_id: product.brand_id || '',
             category_id: product.category_id || '',
             initial_stock: '0', // Stock isn't usually edited directly here in this schema
@@ -112,7 +112,7 @@ export default function ProductFormScreen() {
   }
 
   const handleSave = async () => {
-    if (!form.name_es || !form.sku || !form.base_price || !form.brand_id || !form.category_id) {
+    if (!form.name_es || !form.sku || !form.price_public || !form.brand_id || !form.category_id) {
       Alert.alert('Error', 'Por favor completa todos los campos obligatorios.')
       return
     }
@@ -123,7 +123,7 @@ export default function ProductFormScreen() {
       const payload = {
         name_es: form.name_es,
         sku: form.sku,
-        base_price: parseFloat(form.base_price),
+        price_public: parseFloat(form.price_public),
         brand_id: form.brand_id,
         category_id: form.category_id,
         description_es: form.description_es
@@ -261,8 +261,8 @@ export default function ProductFormScreen() {
                 style={styles.input}
                 placeholder="0.00"
                 keyboardType="decimal-pad"
-                value={form.base_price}
-                onChangeText={(val) => setForm({...form, base_price: val})}
+                value={form.price_public}
+                onChangeText={(val) => setForm({...form, price_public: val})}
               />
             </View>
 

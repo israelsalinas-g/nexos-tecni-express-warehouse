@@ -58,7 +58,7 @@ export interface Product {
   slug: string
   category_id?: string
   brand_id?: string
-  base_price: number
+  price_public: number
   is_active: boolean
   created_at: string
   updated_at: string
