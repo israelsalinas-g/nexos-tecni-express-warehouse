@@ -6,13 +6,19 @@
 export interface Profile {
   id: string
   email: string
-  full_name?: string
-  role: 'admin' | 'staff' | 'customer'
+  full_name: string
+  phone?: string
+  customer_type: string
+  type_verified: boolean
+  type_requested?: string | null
+  preferred_language: string
   is_admin: boolean
-  admin_role?: 'superadmin' | 'warehouse' | 'sales'
+  admin_role?: string | null
   avatar_url?: string
   created_at: string
+  updated_at: string
 }
+
 
 
 export interface Warehouse {
