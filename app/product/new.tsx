@@ -432,9 +432,12 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 24,
     borderTopWidth: 1,
     borderTopColor: tokens.colors.gray100,
+    backgroundColor: '#fff',
   },
+
   saveButton: {
     backgroundColor: tokens.colors.primary,
     borderRadius: 16,

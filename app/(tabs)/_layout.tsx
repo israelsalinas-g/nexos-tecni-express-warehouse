@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router'
-import { Image, View } from 'react-native'
+import { Image, View, Platform } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { tokens } from '@/theme/tokens'
 
@@ -11,11 +11,17 @@ export default function TabLayout() {
         tabBarInactiveTintColor: tokens.colors.gray400,
         tabBarStyle: { 
           borderTopColor: tokens.colors.gray100,
-          height: 64,
-          paddingBottom: 10,
+          height: Platform.OS === 'ios' ? 88 : 72,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 14,
           paddingTop: 10,
           backgroundColor: tokens.colors.bgLight,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
         },
+
         headerStyle: { 
           backgroundColor: tokens.colors.bgLight,
         },
