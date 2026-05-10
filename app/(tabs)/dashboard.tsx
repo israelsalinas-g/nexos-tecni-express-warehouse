@@ -21,9 +21,6 @@ export default function DashboardScreen() {
   const [stats, setStats] = useState({
     totalSales: 12450.00,
     salesTrend: 14,
-    technicalTickets: 24,
-    technicalInProcess: 8,
-    technicalCompleted: 12
   })
 
   const loadData = async () => {
@@ -77,37 +74,13 @@ export default function DashboardScreen() {
         <View style={styles.salesCard}>
           <View style={styles.salesInfo}>
             <Text style={styles.cardLabel}>VENTAS DEL MES</Text>
-            <Text style={styles.salesValue}>${stats.totalSales.toLocaleString()}</Text>
+            <Text style={styles.salesValue}>L. {stats.totalSales.toLocaleString()}</Text>
             <View style={styles.trendRow}>
               <MaterialCommunityIcons name="trending-up" size={16} color={tokens.colors.onPrimary} />
               <Text style={styles.trendText}>+{stats.salesTrend}% vs periodo anterior</Text>
             </View>
           </View>
           <MaterialCommunityIcons name="chart-arc" size={120} color={tokens.colors.onPrimary} style={styles.cardBgIcon} />
-        </View>
-
-        {/* Technical Service Card */}
-        <View style={styles.serviceCard}>
-          <View style={styles.serviceHeader}>
-            <View style={styles.serviceIconWrapper}>
-              <MaterialCommunityIcons name="hammer-wrench" size={20} color={tokens.colors.tertiary} />
-            </View>
-            <Text style={styles.cardLabelDark}>SERVICIO TÉCNICO</Text>
-          </View>
-          <Text style={styles.serviceCount}>{stats.technicalTickets} Tickets</Text>
-          <View style={styles.serviceStats}>
-            <View style={styles.statLine}>
-              <View style={[styles.statDot, { backgroundColor: '#f59e0b' }]} />
-              <Text style={styles.statText}>{stats.technicalInProcess} En Proceso</Text>
-            </View>
-            <View style={styles.statLine}>
-              <View style={[styles.statDot, { backgroundColor: tokens.colors.primary }]} />
-              <Text style={styles.statText}>{stats.technicalCompleted} Completados</Text>
-            </View>
-          </View>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '50%' }]} />
-          </View>
         </View>
       </View>
 
@@ -163,7 +136,7 @@ export default function DashboardScreen() {
                   {item.quantity === 0 ? 'SIN STOCK' : `${item.quantity} UNIDADES`}
                 </Text>
               </View>
-              <Text style={styles.priceText}>${item.products?.base_price?.toFixed(2)}</Text>
+              <Text style={styles.priceText}>L. {item.products?.base_price?.toFixed(2)}</Text>
             </View>
           </View>
         )) : (
@@ -257,60 +230,6 @@ const styles = StyleSheet.create({
     right: -20,
     bottom: -20,
     opacity: 0.1,
-  },
-  serviceCard: {
-    backgroundColor: tokens.colors.bgLight,
-    borderWidth: 1,
-    borderColor: tokens.colors.outlineVariant,
-    borderRadius: tokens.radius.xl,
-    padding: tokens.spacing.lg,
-    ...tokens.shadow.sm,
-  },
-  serviceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  serviceIconWrapper: {
-    padding: 6,
-    backgroundColor: tokens.colors.tertiaryContainer + '20',
-    borderRadius: 6,
-  },
-  serviceCount: {
-    fontSize: tokens.typography.size.xl,
-    fontWeight: tokens.typography.weight.bold,
-    color: tokens.colors.onSurface,
-    marginBottom: 12,
-  },
-  serviceStats: {
-    gap: 6,
-    marginBottom: 16,
-  },
-  statLine: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  statDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  statText: {
-    fontSize: 13,
-    color: tokens.colors.onSurfaceVariant,
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: tokens.colors.gray100,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: tokens.colors.primary,
-    borderRadius: 4,
   },
   chartMockup: {
     backgroundColor: tokens.colors.bgLight,

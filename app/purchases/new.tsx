@@ -238,7 +238,7 @@ export default function NewPurchaseOrderScreen() {
                     </View>
                     <View style={styles.itemSubtotal}>
                       <Text style={styles.inputLabel}>Subtotal</Text>
-                      <Text style={styles.subtotalValue}>${(item.quantity * item.price).toFixed(2)}</Text>
+                      <Text style={styles.subtotalValue}>L. {(item.quantity * item.price).toFixed(2)}</Text>
                     </View>
                   </View>
                 </View>
@@ -251,7 +251,7 @@ export default function NewPurchaseOrderScreen() {
             <View style={styles.summaryCard}>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Total OC</Text>
-                <Text style={styles.totalAmount}>${calculateTotal().toFixed(2)}</Text>
+                <Text style={styles.totalAmount}>L. {calculateTotal().toFixed(2)}</Text>
               </View>
             </View>
           )}

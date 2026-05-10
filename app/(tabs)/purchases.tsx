@@ -78,7 +78,7 @@ export default function PurchasesScreen() {
 
       <View style={styles.cardFooter}>
         <Text style={styles.totalLabel}>Total Estimado:</Text>
-        <Text style={styles.totalValue}>${item.total_amount?.toFixed(2) || '0.00'}</Text>
+        <Text style={styles.totalValue}>L. {item.total_amount?.toFixed(2) || '0.00'}</Text>
       </View>
     </TouchableOpacity>
   )
