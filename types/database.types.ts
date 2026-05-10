@@ -173,10 +173,56 @@ export interface PurchaseOrderItem {
 }
 
 
+export interface Order {
+  id: string
+  order_number: string
+  customer_id: string
+  warehouse_id?: string
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+  payment_status: 'unpaid' | 'paid' | 'partially_paid'
+  payment_method?: string
+  subtotal: number
+  tax_amount: number // 15% ISV
+  total_amount: number
+  notes?: string
+  created_at: string
+  updated_at: string
+  profiles?: Profile
+}
+
+export interface OrderItem {
+  id: string
+  order_id: string
+  product_id: string
+  product_name_es?: string
+  sku?: string
+  quantity: number
+  unit_price: number
+  subtotal: number
+}
+
+export interface Invoice {
+  id: string
+  order_id: string
+  customer_id: string
+  invoice_number: string // SAR Format: 000-000-00-00000000
+  cai: string
+  auth_range_id?: string
+  subtotal: number
+  tax_amount: number
+  total_amount: number
+  status: 'active' | 'voided'
+  created_at: string
+  updated_at: string
+  voided_at?: string
+  voided_by?: string
+}
+
 // UI / Business Logic Wrappers
 
 export interface InventoryRow extends Inventory {
   products?: Product
   warehouses?: Warehouse
 }
+
 
