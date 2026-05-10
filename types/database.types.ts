@@ -123,7 +123,26 @@ export interface InventoryCountItem {
   notes?: string
 }
 
+export interface Supplier {
+  id: string
+  name: string
+  contact_name?: string
+  email?: string
+  phone?: string
+  whatsapp?: string
+  address?: string
+  city?: string
+  country: string
+  tax_id?: string
+  payment_terms?: string
+  notes?: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 // UI / Business Logic Wrappers
+
 export interface InventoryRow extends Inventory {
   products?: Product
   warehouses?: Warehouse
