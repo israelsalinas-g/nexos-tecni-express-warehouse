@@ -50,9 +50,17 @@ export default function AuxiliariesScreen() {
       title: 'Usuarios',
       icon: 'shield-account-outline',
       color: '#6366f1', // Indigo
-      route: '/auxiliaries/users' // Placeholder route
+      route: '/auxiliaries/users'
+    },
+    {
+      id: 'fiscal',
+      title: 'Fiscal / CAI',
+      icon: 'file-certificate-outline',
+      color: '#f43f5e', // Rose
+      route: '/auxiliaries/fiscal'
     }
   ]
+
 
   return (
     <SafeAreaView style={styles.container}>

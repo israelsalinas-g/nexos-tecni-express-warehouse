@@ -8,6 +8,8 @@ import { useRouter } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { tokens } from '@/theme/tokens'
 import { supabase } from '@/lib/supabase'
+import { FiscalService } from '@/services/fiscal.service'
+
 
 const { width } = Dimensions.get('window')
 
@@ -26,6 +28,8 @@ export default function HomeScreen() {
     lowStock: 0,
     activeTransfers: 0
   })
+  const [fiscalAlerts, setFiscalAlerts] = useState<any[] | null>(null)
+
 
   useEffect(() => {
     async function loadData() {
@@ -34,13 +38,20 @@ export default function HomeScreen() {
         setUserName(user.user_metadata.full_name.split(' ')[0])
       }
 
-      // Simulated stats for dashboard
-      // In a real app, these would be real counts from Supabase
       setStats({
         pendingOrders: 12,
         lowStock: 5,
         activeTransfers: 3
       })
+
+      // Load fiscal alerts
+      try {
+        const alerts = await FiscalService.getFiscalAlerts()
+        setFiscalAlerts(alerts)
+      } catch (error) {
+        console.error('Fiscal alerts error:', error)
+      }
+
     }
     loadData()
   }, [])
@@ -103,7 +114,32 @@ export default function HomeScreen() {
         </ImageBackground>
       </View>
 
+      {/* Fiscal Alerts */}
+      {fiscalAlerts && fiscalAlerts.map((alert, idx) => (
+        <TouchableOpacity 
+          key={idx}
+          style={[
+            styles.alertCard, 
+            { backgroundColor: alert.severity === 'error' ? tokens.colors.error + '10' : tokens.colors.warning + '10' }
+          ]}
+          onPress={() => router.push('/auxiliaries/fiscal' as any)}
+        >
+          <MaterialCommunityIcons 
+            name={alert.severity === 'error' ? 'alert-octagon' : 'alert'} 
+            size={24} 
+            color={alert.severity === 'error' ? tokens.colors.error : tokens.colors.warning} 
+          />
+          <View style={styles.alertTextContainer}>
+            <Text style={[styles.alertMessage, { color: alert.severity === 'error' ? tokens.colors.error : tokens.colors.warning }]}>
+              {alert.message}
+            </Text>
+            <Text style={styles.alertSub}>Toca para gestionar CAI</Text>
+          </View>
+        </TouchableOpacity>
+      ))}
+
       {/* Bento Grid */}
+
       <View style={styles.grid}>
         {menuItems.map((item) => (
           <TouchableOpacity
@@ -281,4 +317,29 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: tokens.colors.gray400,
   },
+  alertCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)',
+    ...tokens.shadow.sm,
+  },
+  alertTextContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  alertMessage: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  alertSub: {
+    fontSize: 11,
+    color: tokens.colors.gray400,
+
+    marginTop: 2,
+  },
 })
+

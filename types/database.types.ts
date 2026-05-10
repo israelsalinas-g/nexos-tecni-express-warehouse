@@ -207,7 +207,7 @@ export interface Invoice {
   customer_id: string
   invoice_number: string // SAR Format: 000-000-00-00000000
   cai: string
-  auth_range_id?: string
+  auth_range_id: string
   subtotal: number
   tax_amount: number
   total_amount: number
@@ -218,7 +218,21 @@ export interface Invoice {
   voided_by?: string
 }
 
+export interface InvoiceAuthRange {
+  id: string
+  cai: string
+  prefix: string // e.g. 000-001-01
+  start_number: number
+  end_number: number
+  current_number: number
+  expiration_date: string
+  alert_threshold: number
+  is_active: boolean
+  created_at: string
+}
+
 // UI / Business Logic Wrappers
+
 
 export interface InventoryRow extends Inventory {
   products?: Product
