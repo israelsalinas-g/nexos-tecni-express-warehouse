@@ -19,7 +19,12 @@ export class ProductService {
   static async getBySku(sku: string): Promise<any | null> {
     const { data, error } = await supabase
       .from('products')
-      .select('*, product_images(url)')
+      .select(`
+        *, 
+        product_images(url),
+        brands(name),
+        categories(name_es)
+      `)
       .eq('sku', sku)
       .single()
 

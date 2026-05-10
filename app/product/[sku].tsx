@@ -3,7 +3,8 @@ import {
   View, ActivityIndicator, Text, StyleSheet, 
   ScrollView, Image, TouchableOpacity, SafeAreaView,
   StatusBar,
-  Platform
+  Platform,
+  Share
 } from 'react-native'
 import { useLocalSearchParams, useRouter, useNavigation } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -46,6 +47,34 @@ export default function ProductDetailScreen() {
     }
   }, [sku])
 
+  const totalStock = inventory.reduce((acc, curr) => acc + curr.quantity, 0)
+  const isOutOfStock = totalStock === 0
+
+  const handleShare = async () => {
+    try {
+      const storefrontUrl = `https://nexostecniexpress.com/products/${product?.slug}`
+      const message = `
+📦 *${product.name_es}*
+SKU: ${product.sku}
+${product.description_es ? `\n📝 ${product.description_es}\n` : ''}
+🏷️ Marca: ${product.brands?.name || 'N/A'}
+🗂️ Categoría: ${product.categories?.name_es || 'N/A'}
+💰 Precio: L. ${product.base_price?.toFixed(2)}
+📉 Stock Total: ${totalStock} unidades
+
+🔗 Ver producto: ${storefrontUrl}
+      `.trim()
+
+      await Share.share({
+        message,
+        title: product.name_es,
+        url: storefrontUrl
+      })
+    } catch (error) {
+      console.error('Error sharing product:', error)
+    }
+  }
+
   useEffect(() => {
     loadData()
   }, [loadData])
@@ -71,8 +100,6 @@ export default function ProductDetailScreen() {
     )
   }
 
-  const totalStock = inventory.reduce((acc, curr) => acc + curr.quantity, 0)
-  const isOutOfStock = totalStock === 0
 
   return (
     <SafeAreaView style={styles.container}>
@@ -96,6 +123,10 @@ export default function ProductDetailScreen() {
           <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
             <MaterialCommunityIcons name="chevron-left" size={28} color={tokens.colors.gray900} />
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+            <MaterialCommunityIcons name="share-variant" size={24} color={tokens.colors.gray900} />
+          </TouchableOpacity>
         </View>
 
 
@@ -118,14 +149,24 @@ export default function ProductDetailScreen() {
 
           {/* Badges Section */}
           <View style={styles.badgesRow}>
-            <View style={styles.badge}>
-              <MaterialCommunityIcons name="tag-outline" size={16} color={tokens.colors.gray600} />
-              <Text style={styles.badgeText}>Repuestos</Text>
-            </View>
-            <View style={styles.badge}>
-              <MaterialCommunityIcons name="factory" size={16} color={tokens.colors.gray600} />
-              <Text style={styles.badgeText}>Tecni-Express</Text>
-            </View>
+            {product.categories?.name_es && (
+              <View style={styles.badge}>
+                <MaterialCommunityIcons name="tag-outline" size={16} color={tokens.colors.gray600} />
+                <Text style={styles.badgeText}>{product.categories.name_es}</Text>
+              </View>
+            )}
+            {product.brands?.name && (
+              <View style={styles.badge}>
+                <MaterialCommunityIcons name="factory" size={16} color={tokens.colors.gray600} />
+                <Text style={styles.badgeText}>{product.brands.name}</Text>
+              </View>
+            )}
+            {!product.categories?.name_es && !product.brands?.name && (
+              <View style={styles.badge}>
+                <MaterialCommunityIcons name="package-variant" size={16} color={tokens.colors.gray600} />
+                <Text style={styles.badgeText}>General</Text>
+              </View>
+            )}
           </View>
 
           {/* Stock Overview Card */}
@@ -232,6 +273,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Platform.OS === 'ios' ? 10 : 20,
     left: 20,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...tokens.shadow.md,
+  },
+  shareButton: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 10 : 20,
+    right: 20,
     backgroundColor: 'rgba(255,255,255,0.8)',
     width: 44,
     height: 44,
