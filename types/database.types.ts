@@ -147,6 +147,32 @@ export interface Supplier {
   updated_at: string
 }
 
+export interface PurchaseOrder {
+  id: string
+  po_number: string
+  supplier_id: string
+  warehouse_id: string
+  status: 'draft' | 'pending' | 'received' | 'cancelled'
+  total_amount?: number
+  notes?: string
+  created_by: string
+  created_at: string
+  updated_at: string
+  suppliers?: Supplier
+  warehouses?: Warehouse
+}
+
+export interface PurchaseOrderItem {
+  id: string
+  purchase_order_id: string
+  product_id: string
+  quantity_ordered: number
+  quantity_received?: number
+  unit_price?: number
+  products?: Product
+}
+
+
 // UI / Business Logic Wrappers
 
 export interface InventoryRow extends Inventory {

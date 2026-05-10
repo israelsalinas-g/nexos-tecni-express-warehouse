@@ -74,11 +74,22 @@ export default function TabLayout() {
         name="orders"
         options={{
           title: 'Órdenes',
+          href: null,
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="clipboard-text-outline" color={color} size={size} />
           ),
         }}
       />
+      <Tabs.Screen
+        name="purchases"
+        options={{
+          title: 'Compras',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cart-outline" color={color} size={size} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="transfers"
         options={{

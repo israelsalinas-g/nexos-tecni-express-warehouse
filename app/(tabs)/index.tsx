@@ -71,6 +71,14 @@ export default function HomeScreen() {
       route: '/(tabs)/orders'
     },
     { 
+      id: 'purchases', 
+      title: 'Compras', 
+      subtitle: 'Órdenes de Compra', 
+      icon: 'cart-outline', 
+      color: '#8b5cf6', // Violet
+      route: '/(tabs)/purchases'
+    },
+    { 
       id: 'transfers', 
       title: 'Traslados', 
       subtitle: 'Movimiento Interno', 
@@ -79,6 +87,7 @@ export default function HomeScreen() {
       route: '/(tabs)/transfers'
     }
   ]
+
 
   return (
     <ScrollView 
