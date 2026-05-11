@@ -8,7 +8,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { OrderService } from '@/services/order.service'
 import { tokens } from '@/theme/tokens'
-import { Order } from '@/types/database.types'
 
 export default function SalesScreen() {
   const router = useRouter()
@@ -39,27 +38,8 @@ export default function SalesScreen() {
     fetchSales()
   }
 
-  const handleConfirmPayment = (orderId: string, orderNumber: string) => {
-    Alert.alert(
-      'Confirmar Pago',
-      `¿Deseas confirmar el pago de la orden ${orderNumber}? Esto generará la factura fiscal.`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Confirmar Pago', 
-          onPress: async () => {
-            try {
-              // In a real app, this would also trigger CAI/SAR invoice generation
-              await OrderService.confirmPayment(orderId, 'transfer') // Default to transfer as requested
-              Alert.alert('Éxito', 'Pago confirmado y factura generada.')
-              fetchSales()
-            } catch (error: any) {
-              Alert.alert('Error', error.message)
-            }
-          }
-        }
-      ]
-    )
+  const handleConfirmPayment = (orderId: string) => {
+    router.push(`/invoices/new?fromOrderId=${orderId}` as any)
   }
 
   const renderItem = ({ item }: { item: any }) => (
@@ -108,11 +88,12 @@ export default function SalesScreen() {
         </View>
         
         {item.payment_status !== 'paid' && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.actionBtn}
-            onPress={() => handleConfirmPayment(item.id, item.order_number)}
+            onPress={() => handleConfirmPayment(item.id)}
           >
-            <Text style={styles.actionBtnText}>Confirmar Pago</Text>
+            <MaterialCommunityIcons name="receipt-outline" size={16} color="#fff" />
+            <Text style={styles.actionBtnText}>Facturar</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -123,13 +104,22 @@ export default function SalesScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.screenHeader}>
         <Text style={styles.screenTitle}>Gestión de Ventas</Text>
-        <TouchableOpacity 
-          style={styles.newSaleBtn}
-          onPress={() => router.push('/sales/new' as any)}
-        >
-          <MaterialCommunityIcons name="plus" size={24} color="#fff" />
-          <Text style={styles.newSaleBtnText}>Nueva</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={[styles.newSaleBtn, styles.invoiceBtn]}
+            onPress={() => router.push('/invoices/new' as any)}
+          >
+            <MaterialCommunityIcons name="receipt-text-outline" size={18} color={tokens.colors.primary} />
+            <Text style={styles.invoiceBtnText}>Factura</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.newSaleBtn}
+            onPress={() => router.push('/sales/new' as any)}
+          >
+            <MaterialCommunityIcons name="plus" size={20} color="#fff" />
+            <Text style={styles.newSaleBtnText}>Nueva</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {loading && !refreshing ? (
@@ -169,6 +159,7 @@ const styles = StyleSheet.create({
     borderBottomColor: tokens.colors.gray100,
   },
   screenTitle: { fontSize: 24, fontWeight: '800', color: tokens.colors.gray900 },
+  headerActions: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   newSaleBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -180,6 +171,12 @@ const styles = StyleSheet.create({
     ...tokens.shadow.sm,
   },
   newSaleBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  invoiceBtn: {
+    backgroundColor: tokens.colors.primary + '12',
+    borderWidth: 1,
+    borderColor: tokens.colors.primary + '40',
+  },
+  invoiceBtnText: { color: tokens.colors.primary, fontWeight: '700', fontSize: 13 },
   list: { padding: 16, paddingBottom: 40 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   card: {
@@ -246,6 +243,9 @@ const styles = StyleSheet.create({
   totalLabel: { fontSize: 11, color: tokens.colors.gray400, textTransform: 'uppercase' },
   totalValue: { fontSize: 20, fontWeight: '900', color: tokens.colors.primary, marginTop: 2 },
   actionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: tokens.colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,

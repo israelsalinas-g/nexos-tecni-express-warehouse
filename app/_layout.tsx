@@ -48,6 +48,7 @@ export default function RootLayout() {
       <Stack.Screen name="receive/[poId]" options={{ headerShown: true, title: 'Recepción de OC' }} />
       <Stack.Screen name="count/[sessionId]" options={{ headerShown: true, title: 'Conteo Físico' }} />
       <Stack.Screen name="product/[sku]" options={{ headerShown: true, title: 'Producto' }} />
+      <Stack.Screen name="invoices/new" options={{ headerShown: false, presentation: 'modal' }} />
     </Stack>
   )
 }
