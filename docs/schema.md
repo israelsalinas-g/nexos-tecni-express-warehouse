@@ -23321,6 +23321,286 @@
   },
   {
     "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "quotation_id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "product_id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "product_sku",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "product_name_es",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "product_name_en",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "quantity",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "unit_price",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "subtotal",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotation_items",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "gen_random_uuid()"
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "quotation_number",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "customer_id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "customer_name",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "customer_email",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "customer_tax_id",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "customer_address",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "subtotal",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "tax_amount",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "total",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "status",
+    "data_type": "USER-DEFINED",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "'draft'::quotation_status"
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "valid_until",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "(now() + '15 days'::interval)"
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "notes",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "internal_notes",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "converted_order_id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "public",
+    "table_name": "quotations",
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "now()"
+  },
+  {
+    "table_catalog": "postgres",
     "table_schema": "information_schema",
     "table_name": "referential_constraints",
     "column_name": "constraint_catalog",
@@ -25541,21 +25821,21 @@
   },
   {
     "table_catalog": "postgres",
-    "table_schema": "auth",
-    "table_name": "schema_migrations",
-    "column_name": "version",
-    "data_type": "character varying",
-    "character_maximum_length": 255,
-    "is_nullable": "NO",
-    "column_default": null
-  },
-  {
-    "table_catalog": "postgres",
     "table_schema": "realtime",
     "table_name": "schema_migrations",
     "column_name": "version",
     "data_type": "bigint",
     "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_catalog": "postgres",
+    "table_schema": "auth",
+    "table_name": "schema_migrations",
+    "column_name": "version",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
     "is_nullable": "NO",
     "column_default": null
   },
