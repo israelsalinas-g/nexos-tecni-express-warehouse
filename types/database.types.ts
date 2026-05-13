@@ -180,13 +180,32 @@ export interface Order {
   warehouse_id?: string
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
   payment_status: 'unpaid' | 'paid' | 'partially_paid'
-  payment_method?: string
+  payment_method?: 'cash' | 'card' | 'transfer' | 'credit' | null
   subtotal: number
-  tax_amount: number // 15% ISV
+  tax_amount: number
+  discount?: number
+  shipping_cost?: number
   total: number
   notes?: string
+  notes_internal?: string
+  payment_reference?: string
+  shipping_name?: string
+  shipping_phone?: string
+  shipping_address?: string
+  shipping_city?: string
+  customer_type_at_purchase?: string
   created_at: string
   updated_at: string
+  profiles?: Profile
+}
+
+export interface OrderStatusHistory {
+  id: string
+  order_id: string
+  status: Order['status']
+  note?: string
+  created_by: string
+  created_at: string
   profiles?: Profile
 }
 
@@ -247,13 +266,270 @@ export interface CompanyProfile {
   updated_at: string
 }
 
-// UI / Business Logic Wrappers
+// ─── Quotations ──────────────────────────────────────────────────────────────
 
+export type QuotationStatus = 'draft' | 'sent' | 'accepted' | 'expired' | 'cancelled'
 
+export interface Quotation {
+  id: string
+  quotation_number: string
+  customer_id: string
+  customer_name?: string
+  customer_email?: string
+  subtotal: number
+  tax_amount: number
+  discount?: number
+  total: number
+  status: QuotationStatus
+  valid_until?: string
+  notes?: string
+  created_by: string
+  created_at: string
+  updated_at: string
+  profiles?: Profile
+}
+
+export interface QuotationItem {
+  id: string
+  quotation_id: string
+  product_id?: string
+  product_name_es: string
+  product_sku?: string
+  quantity: number
+  unit_price: number
+  subtotal: number
+  products?: Product
+}
+
+// ─── Shipments ───────────────────────────────────────────────────────────────
+
+export type ShipmentStatus = 'pending' | 'dispatched' | 'in_transit' | 'delivered' | 'returned'
+
+export interface Shipment {
+  id: string
+  order_id: string
+  carrier_id?: string
+  tracking_number?: string
+  tracking_url?: string
+  status: ShipmentStatus
+  shipping_cost?: number
+  estimated_delivery?: string
+  dispatched_at?: string
+  delivered_at?: string
+  notes?: string
+  created_by: string
+  created_at: string
+  updated_at: string
+  orders?: Order
+}
+
+// ─── Finance: Expenses ───────────────────────────────────────────────────────
+
+export type ExpenseCategory = 'rent' | 'utilities' | 'salary' | 'supplies' | 'maintenance' | 'marketing' | 'other'
+
+export interface Expense {
+  id: string
+  description: string
+  amount: number
+  category: ExpenseCategory
+  expense_date: string
+  receipt_url?: string
+  created_by: string
+  created_at: string
+  updated_at: string
+}
+
+// ─── Finance: Payables ───────────────────────────────────────────────────────
+
+export interface PayablePayment {
+  id: string
+  purchase_order_id: string
+  amount: number
+  payment_date: string
+  payment_method?: string
+  reference?: string
+  notes?: string
+  created_by: string
+  created_at: string
+}
+
+// ─── Credit Accounts ─────────────────────────────────────────────────────────
+
+export type CreditTransactionType = 'charge' | 'payment' | 'adjustment'
+
+export interface CreditAccount {
+  id: string
+  customer_id: string
+  credit_limit: number
+  current_balance: number
+  due_date?: string
+  payment_terms?: string
+  is_active: boolean
+  created_by: string
+  created_at: string
+  updated_at: string
+  profiles?: Profile
+}
+
+export interface CreditTransaction {
+  id: string
+  account_id: string
+  transaction_type: CreditTransactionType
+  amount: number
+  description?: string
+  order_id?: string
+  paid_at?: string
+  created_by: string
+  created_at: string
+}
+
+// ─── Loyalty Program ─────────────────────────────────────────────────────────
+
+export type LoyaltyTier = 'bronze' | 'silver' | 'gold'
+export type LoyaltyTransactionType = 'earn' | 'redeem' | 'adjustment' | 'expire'
+
+export interface LoyaltyAccount {
+  id: string
+  customer_id: string
+  points_balance: number
+  points_lifetime: number
+  tier: LoyaltyTier
+  created_at: string
+  updated_at: string
+  profiles?: Profile
+}
+
+export interface LoyaltyTransaction {
+  id: string
+  account_id: string
+  transaction_type: LoyaltyTransactionType
+  points: number
+  description?: string
+  order_id?: string
+  created_by?: string
+  created_at: string
+}
+
+// ─── Service Tickets ─────────────────────────────────────────────────────────
+
+export type TicketStatus =
+  | 'received'
+  | 'diagnosed'
+  | 'awaiting_approval'
+  | 'in_repair'
+  | 'ready'
+  | 'delivered'
+  | 'cancelled'
+
+export interface ServiceTicket {
+  id: string
+  ticket_number: string
+  customer_id: string
+  assigned_to?: string
+  appliance_brand?: string
+  appliance_model?: string
+  appliance_serial?: string
+  appliance_type?: string
+  problem_description: string
+  diagnosis?: string
+  repair_notes?: string
+  estimated_cost?: number
+  final_cost?: number
+  parts_cost?: number
+  status: TicketStatus
+  customer_approved?: boolean
+  approved_at?: string
+  estimated_ready?: string
+  delivered_at?: string
+  created_at: string
+  updated_at: string
+  profiles?: Profile
+  assigned_profile?: Profile
+}
+
+export interface TicketPart {
+  id: string
+  ticket_id: string
+  product_id: string
+  quantity: number
+  unit_cost: number
+  sale_price: number
+  subtotal: number
+  products?: Product
+}
+
+export interface TicketStatusHistory {
+  id: string
+  ticket_id: string
+  status: TicketStatus
+  note?: string
+  created_by: string
+  created_at: string
+  profiles?: Profile
+}
+
+// ─── Compatibility ───────────────────────────────────────────────────────────
+
+export interface ApplianceModel {
+  id: string
+  model_number: string
+  appliance_type: string
+  brand_id?: string
+  is_active: boolean
+  created_at: string
+  brands?: Brand
+}
+
+export interface ProductCompatibility {
+  id: string
+  product_id: string
+  model_id: string
+  notes?: string
+  products?: Product
+  appliance_models?: ApplianceModel
+}
+
+export interface PartEquivalence {
+  id: string
+  product_id: string
+  equivalent_sku: string
+  brand_name?: string
+  notes?: string
+}
+
+// ─── Audit Log ───────────────────────────────────────────────────────────────
+
+export type AuditAction = 'create' | 'update' | 'delete' | 'login' | 'status_change' | 'void'
+
+export interface AuditLog {
+  id: string
+  user_id: string
+  action: AuditAction
+  entity_type: string
+  entity_id?: string
+  old_values?: Record<string, unknown>
+  new_values?: Record<string, unknown>
+  description?: string
+  ip_address?: string
+  created_at: string
+  profiles?: Profile
+}
+
+// ─── UI / Business Logic Wrappers ────────────────────────────────────────────
 
 export interface InventoryRow extends Inventory {
   products?: Product
   warehouses?: Warehouse
 }
 
+export interface PurchaseOrderWithPaid extends PurchaseOrder {
+  paid_total: number
+  suppliers?: Supplier
+}
+
+export interface CreditAccountWithBalance extends CreditAccount {
+  available: number
+  is_overdue: boolean
+  profiles?: Profile
+}
 

@@ -26,14 +26,21 @@
         "foregroundImage": "./assets/site/logo_tecni_express.png",
         "backgroundColor": "#ffffff"
       },
-
-      "permissions": ["android.permission.CAMERA"],
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
       "edgeToEdgeEnabled": true
     },
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      ["expo-camera", { "cameraPermission": "Se necesita la cámara para escanear códigos de barras." }]
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Se necesita la cámara para escanear códigos de barras."
+        }
+      ],
+      "@react-native-community/datetimepicker"
     ]
   }
 }
