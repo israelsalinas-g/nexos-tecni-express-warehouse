@@ -98,6 +98,7 @@ export default function RootLayout() {
       <Stack.Screen name="reports/index" options={{ headerShown: false }} />
       <Stack.Screen name="reports/sales" options={{ headerShown: true, title: 'Reporte de Ventas' }} />
       <Stack.Screen name="reports/inventory" options={{ headerShown: true, title: 'Reporte de Inventario' }} />
+      <Stack.Screen name="reports/customers" options={{ headerShown: true, title: 'Reporte de Clientes' }} />
       <Stack.Screen name="reports/finance" options={{ headerShown: true, title: 'Reporte Financiero' }} />
 
       {/* F7 — Compatibility & Audit */}

@@ -105,7 +105,15 @@ export default function InicioScreen() {
       icon: 'swap-horizontal-bold',
       color: tokens.colors.onSurfaceVariant,
       route: '/(tabs)/movements'
-    }
+    },
+    {
+      id: 'reports',
+      title: 'Reportes',
+      subtitle: 'Análisis y métricas',
+      icon: 'chart-bar',
+      color: '#3b82f6',
+      route: '/reports/index'
+    },
   ]
 
   if (loading && !refreshing) {
