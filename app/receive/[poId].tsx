@@ -39,7 +39,7 @@ export default function ReceivePOScreen() {
       setPoNumber(data.po_number)
       navigation.setOptions({ title: `Recepción OC #${data.po_number}` })
 
-      const mapped: POItem[] = (data.purchase_order_items as {
+      const mapped: POItem[] = ((data.purchase_order_items ?? []) as unknown as {
         id: string; product_id: string; quantity_ordered: number;
         products: { name_es: string; sku: string } | null
       }[]).map((i) => ({

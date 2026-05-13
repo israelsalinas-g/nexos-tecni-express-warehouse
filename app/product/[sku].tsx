@@ -130,6 +130,13 @@ ${product.description_es ? `\n📝 ${product.description_es}\n` : ''}
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <MaterialCommunityIcons name="share-variant" size={24} color={tokens.colors.gray900} />
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => router.push(`/product/edit/${product?.sku}` as any)}
+          >
+            <MaterialCommunityIcons name="pencil-outline" size={22} color={tokens.colors.gray900} />
+          </TouchableOpacity>
         </View>
 
 
@@ -288,6 +295,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Platform.OS === 'ios' ? 10 : 20,
     right: 20,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...tokens.shadow.md,
+  },
+  editButton: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 10 : 20,
+    right: 72,
     backgroundColor: 'rgba(255,255,255,0.8)',
     width: 44,
     height: 44,
