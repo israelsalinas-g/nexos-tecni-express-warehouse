@@ -114,6 +114,14 @@ export default function InicioScreen() {
       color: '#3b82f6',
       route: '/reports/index'
     },
+    {
+      id: 'settings',
+      title: 'Configuraciones',
+      subtitle: 'Ajustes del Sistema',
+      icon: 'cog-outline',
+      color: tokens.colors.gray600,
+      route: '/(tabs)/settings'
+    },
   ]
 
   if (loading && !refreshing) {

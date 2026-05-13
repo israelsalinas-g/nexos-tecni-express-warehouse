@@ -143,6 +143,17 @@ export default function TabLayout() {
         options={{ title: 'Envíos', href: null }}
       />
 
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Configuración',
+          href: null,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cog-outline" color={color} size={size} />
+          ),
+        }}
+      />
+
     </Tabs>
   )
 }

@@ -44,27 +44,6 @@ export default function AuxiliariesScreen() {
       icon: 'warehouse',
       color: '#ef4444', // Red
       route: '/auxiliaries/warehouses'
-    },
-    {
-      id: 'users',
-      title: 'Usuarios',
-      icon: 'shield-account-outline',
-      color: '#6366f1', // Indigo
-      route: '/auxiliaries/users'
-    },
-    {
-      id: 'fiscal',
-      title: 'Fiscal / CAI',
-      icon: 'file-certificate-outline',
-      color: '#f43f5e', // Rose
-      route: '/auxiliaries/fiscal'
-    },
-    {
-      id: 'company',
-      title: 'Datos Empresa',
-      icon: 'office-building-cog-outline',
-      color: '#0ea5e9', // Sky
-      route: '/auxiliaries/company'
     }
   ]
 
