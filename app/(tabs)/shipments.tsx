@@ -125,7 +125,12 @@ export default function ShipmentsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        style={styles.tabsContainer}
+        contentContainerStyle={styles.tabs}
+      >
         {TABS.map(tab => (
           <TouchableOpacity
             key={tab.key}
@@ -189,9 +194,10 @@ const styles = StyleSheet.create({
   },
   solidBtnText: { fontSize: 13, fontWeight: '700', color: '#fff' },
 
-  tabs: { paddingHorizontal: tokens.spacing.md, paddingVertical: tokens.spacing.sm, gap: tokens.spacing.sm },
+  tabsContainer: { flexGrow: 0, maxHeight: 50 },
+  tabs: { paddingHorizontal: tokens.spacing.md, paddingVertical: tokens.spacing.xs, gap: tokens.spacing.xs, alignItems: 'center' },
   tab: {
-    paddingHorizontal: tokens.spacing.md, paddingVertical: 7,
+    paddingHorizontal: tokens.spacing.md, paddingVertical: 6,
     borderRadius: tokens.radius.full,
     borderWidth: 1.5, borderColor: tokens.colors.gray200,
     backgroundColor: tokens.colors.bgLight,
