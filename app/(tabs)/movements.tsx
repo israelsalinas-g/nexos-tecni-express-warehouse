@@ -35,8 +35,13 @@ export default function MovementsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Movimientos</Text>
-        <Text style={styles.subtitle}>Gestión de stock y suministros</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
+        </TouchableOpacity>
+        <View style={styles.headerText}>
+          <Text style={styles.title}>Movimientos</Text>
+          <Text style={styles.subtitle}>Gestión de stock y suministros</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -71,20 +76,29 @@ const styles = StyleSheet.create({
     backgroundColor: tokens.colors.bgScreen,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 24,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: tokens.colors.gray100,
+    gap: 16,
+  },
+  backBtn: {
+    padding: 4,
+  },
+  headerText: {
+    flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '800',
     color: tokens.colors.gray900,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: tokens.colors.gray400,
-    marginTop: 4,
+    marginTop: 2,
   },
   content: {
     padding: 20,

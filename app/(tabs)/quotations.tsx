@@ -102,6 +102,9 @@ export default function QuotationsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.screenHeader}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
+        </TouchableOpacity>
         <Text style={styles.screenTitle}>Cotizaciones</Text>
         <TouchableOpacity
           style={styles.solidBtn}
@@ -176,7 +179,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: tokens.colors.gray100,
   },
-  screenTitle: { fontSize: tokens.typography.size.xl, fontWeight: '800', color: tokens.colors.gray900 },
+  screenTitle: { fontSize: tokens.typography.size.xl, fontWeight: '800', color: tokens.colors.gray900, flex: 1, marginLeft: 12 },
+  backBtn: { padding: 4 },
   solidBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     paddingHorizontal: 12, paddingVertical: 8,

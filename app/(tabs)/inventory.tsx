@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { 
   View, StyleSheet, ActivityIndicator, TextInput, 
-  ScrollView, TouchableOpacity, Text 
+  ScrollView, TouchableOpacity, Text, SafeAreaView
 } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
@@ -116,9 +116,12 @@ export default function InventoryScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
+          </TouchableOpacity>
           <Text style={styles.title}>Inventario</Text>
           <TouchableOpacity 
             style={styles.addButton} 
@@ -128,7 +131,6 @@ export default function InventoryScreen() {
             <MaterialCommunityIcons name="plus" size={20} color={tokens.colors.primary} />
             <Text style={styles.addButtonText}>Nuevo</Text>
           </TouchableOpacity>
-
         </View>
 
         <View style={styles.searchWrapper}>
@@ -213,7 +215,7 @@ export default function InventoryScreen() {
       >
         <MaterialCommunityIcons name="barcode-scan" size={26} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -235,10 +237,13 @@ const styles = StyleSheet.create({
     marginBottom: tokens.spacing[4],
   },
   title: {
-    fontSize: tokens.typography.size['2xl'],
+    fontSize: tokens.typography.size.xl,
     fontWeight: tokens.typography.weight.bold,
     color: tokens.colors.gray900,
+    flex: 1,
+    marginLeft: 12,
   },
+  backBtn: { padding: 4 },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',

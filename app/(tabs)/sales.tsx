@@ -131,7 +131,10 @@ export default function SalesScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.screenHeader}>
-        <Text style={styles.screenTitle}>Gestión de Ventas</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
+        </TouchableOpacity>
+        <Text style={styles.screenTitle}>Ventas</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.outlineBtn}
@@ -211,7 +214,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: tokens.colors.gray100,
   },
-  screenTitle: { fontSize: tokens.typography.size.xl, fontWeight: '800', color: tokens.colors.gray900 },
+  screenTitle: { fontSize: tokens.typography.size.xl, fontWeight: '800', color: tokens.colors.gray900, flex: 1, marginLeft: 12 },
+  backBtn: { padding: 4 },
   headerActions: { flexDirection: 'row', gap: tokens.spacing.sm },
   outlineBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,

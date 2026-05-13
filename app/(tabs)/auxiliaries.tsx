@@ -60,8 +60,13 @@ export default function AuxiliariesScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>Auxiliares</Text>
-          <Text style={styles.subtitle}>Gestión de datos maestros</Text>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
+          </TouchableOpacity>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>Auxiliares</Text>
+            <Text style={styles.subtitle}>Gestión de datos maestros</Text>
+          </View>
         </View>
 
         <View style={styles.grid}>
@@ -101,20 +106,31 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 32,
     marginTop: 10,
-    alignItems: 'center',
+    gap: 12,
+  },
+  backBtn: {
+    padding: 4,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    ...tokens.shadow.sm,
+  },
+  headerText: {
+    flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '800',
     color: tokens.colors.gray900,
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: tokens.colors.gray600,
-    marginTop: 4,
+    marginTop: 2,
   },
   grid: {
     flexDirection: 'row',
