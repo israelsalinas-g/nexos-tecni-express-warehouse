@@ -30,7 +30,7 @@ export class QuotationService {
   static async getAll(status?: string): Promise<Quotation[]> {
     let q = supabase
       .from('quotations')
-      .select('*, profiles(full_name, phone, email)')
+      .select('*, profiles!customer_id(full_name, phone, email)')
       .order('created_at', { ascending: false })
 
     if (status && status !== 'all') {
@@ -45,7 +45,7 @@ export class QuotationService {
   static async getById(id: string): Promise<QuotationDetail | null> {
     const { data, error } = await supabase
       .from('quotations')
-      .select('*, profiles(full_name, phone, email), quotation_items(*, products(name_es, sku))')
+      .select('*, profiles!customer_id(full_name, phone, email), quotation_items(*, products(name_es, sku))')
       .eq('id', id)
       .single()
 
