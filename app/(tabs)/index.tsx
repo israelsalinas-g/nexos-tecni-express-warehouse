@@ -50,35 +50,51 @@ export default function InicioScreen() {
   }
 
   const menuItems = [
-    { 
-      id: 'sales', 
-      title: 'Ventas', 
-      subtitle: 'Facturación y POS', 
-      icon: 'cash-register', 
+    {
+      id: 'sales',
+      title: 'Ventas',
+      subtitle: 'Facturación y POS',
+      icon: 'cash-register',
       color: tokens.colors.primary,
       route: '/(tabs)/sales'
     },
-    { 
-      id: 'inventory', 
-      title: 'Productos', 
-      subtitle: 'Consultar Stock', 
-      icon: 'package-variant-closed', 
+    {
+      id: 'inventory',
+      title: 'Productos',
+      subtitle: 'Consultar Stock',
+      icon: 'package-variant-closed',
       color: tokens.colors.tertiary,
       route: '/(tabs)/inventory'
     },
-    { 
-      id: 'auxiliaries', 
-      title: 'Auxiliares', 
-      subtitle: 'Maestros y CRUDs', 
-      icon: 'database-cog-outline', 
+    {
+      id: 'quotations',
+      title: 'Cotizaciones',
+      subtitle: 'Presupuestos',
+      icon: 'file-document-outline',
+      color: '#0ea5e9',
+      route: '/quotations/index'
+    },
+    {
+      id: 'shipments',
+      title: 'Envíos',
+      subtitle: 'Logística',
+      icon: 'truck-fast-outline',
+      color: '#f59e0b',
+      route: '/shipments/index'
+    },
+    {
+      id: 'auxiliaries',
+      title: 'Auxiliares',
+      subtitle: 'Maestros y CRUDs',
+      icon: 'database-cog-outline',
       color: tokens.colors.secondary,
       route: '/(tabs)/auxiliaries'
     },
-    { 
-      id: 'movements', 
-      title: 'Movimientos', 
-      subtitle: 'Compras y Traslados', 
-      icon: 'swap-horizontal-bold', 
+    {
+      id: 'movements',
+      title: 'Movimientos',
+      subtitle: 'Compras y Traslados',
+      icon: 'swap-horizontal-bold',
       color: tokens.colors.onSurfaceVariant,
       route: '/(tabs)/movements'
     }
