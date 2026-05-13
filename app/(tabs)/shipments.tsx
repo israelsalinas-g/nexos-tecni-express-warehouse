@@ -41,7 +41,8 @@ export default function ShipmentsScreen() {
       setLoading(true)
       const data = await ShipmentService.getAll(status)
       setShipments(data)
-    } catch {
+    } catch (error) {
+      console.error('[ShipmentsScreen] Error loading data:', error)
       Alert.alert('Error', 'No se pudieron cargar los envíos.')
     } finally {
       setLoading(false)
@@ -63,7 +64,9 @@ export default function ShipmentsScreen() {
             Envío #{item.id.slice(-6).toUpperCase()}
           </Text>
           <Text style={styles.date}>
-            {new Date(item.created_at).toLocaleDateString('es-HN', { day: '2-digit', month: 'short', year: 'numeric' })}
+            {item.created_at 
+              ? new Date(item.created_at).toLocaleDateString('es-HN', { day: '2-digit', month: 'short', year: 'numeric' })
+              : 'Fecha no disponible'}
           </Text>
         </View>
         <StatusBadge status={item.status} map={SHIPMENT_STATUS_MAP} />

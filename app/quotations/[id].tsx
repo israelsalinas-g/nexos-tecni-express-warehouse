@@ -11,7 +11,7 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { SectionCard } from '@/components/common/SectionCard'
 import { ConfirmSheet } from '@/components/common/ConfirmSheet'
 import { tokens } from '@/theme/tokens'
-import { QUOTATION_STATUS_MAP } from './index'
+import { QUOTATION_STATUS_MAP } from '@/app/(tabs)/quotations'
 import { QuotationStatus } from '@/types/database.types'
 
 export default function QuotationDetailScreen() {

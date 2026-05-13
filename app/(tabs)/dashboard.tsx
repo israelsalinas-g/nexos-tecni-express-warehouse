@@ -162,7 +162,7 @@ export default function DashboardScreen() {
           value={String(kpis?.pendingOrders ?? 0)}
           color={tokens.colors.warning}
           bg={tokens.colors.warning + '15'}
-          onPress={() => router.push('/orders/index' as any)}
+          onPress={() => router.push('/(tabs)/sales' as any)}
         />
         <KpiCard
           icon="file-document-outline"
@@ -170,7 +170,7 @@ export default function DashboardScreen() {
           value={String(kpis?.openQuotations ?? 0)}
           color={tokens.colors.info}
           bg={tokens.colors.info + '15'}
-          onPress={() => router.push('/quotations/index' as any)}
+          onPress={() => router.push('/(tabs)/quotations' as any)}
         />
         <KpiCard
           icon="account-plus-outline"

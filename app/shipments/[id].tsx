@@ -12,7 +12,7 @@ import { SectionCard } from '@/components/common/SectionCard'
 import { ConfirmSheet } from '@/components/common/ConfirmSheet'
 import { BottomSheet } from '@/components/common/BottomSheet'
 import { tokens } from '@/theme/tokens'
-import { SHIPMENT_STATUS_MAP } from './index'
+import { SHIPMENT_STATUS_MAP } from '@/app/(tabs)/shipments'
 import { ShipmentStatus } from '@/types/database.types'
 
 const STATUS_TRANSITIONS: Record<ShipmentStatus, ShipmentStatus[]> = {

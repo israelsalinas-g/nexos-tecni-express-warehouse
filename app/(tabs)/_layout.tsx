@@ -133,6 +133,16 @@ export default function TabLayout() {
         options={{ title: 'Traslados', href: null }}
       />
 
+      <Tabs.Screen
+        name="quotations"
+        options={{ title: 'Cotizaciones', href: null }}
+      />
+
+      <Tabs.Screen
+        name="shipments"
+        options={{ title: 'Envíos', href: null }}
+      />
+
     </Tabs>
   )
 }

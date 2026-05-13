@@ -72,7 +72,7 @@ export default function InicioScreen() {
       subtitle: 'Presupuestos',
       icon: 'file-document-outline',
       color: '#0ea5e9',
-      route: '/quotations/index'
+      route: '/(tabs)/quotations'
     },
     {
       id: 'shipments',
@@ -80,7 +80,7 @@ export default function InicioScreen() {
       subtitle: 'Logística',
       icon: 'truck-fast-outline',
       color: '#f59e0b',
-      route: '/shipments/index'
+      route: '/(tabs)/shipments'
     },
     {
       id: 'auxiliaries',

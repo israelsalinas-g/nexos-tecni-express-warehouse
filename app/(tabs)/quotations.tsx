@@ -42,7 +42,8 @@ export default function QuotationsScreen() {
       setLoading(true)
       const data = await QuotationService.getAll(status)
       setQuotations(data)
-    } catch {
+    } catch (error) {
+      console.error('[QuotationsScreen] Error loading data:', error)
       Alert.alert('Error', 'No se pudieron cargar las cotizaciones.')
     } finally {
       setLoading(false)
@@ -62,7 +63,9 @@ export default function QuotationsScreen() {
         <View>
           <Text style={styles.quotationNo}>#{item.quotation_number}</Text>
           <Text style={styles.date}>
-            {new Date(item.created_at).toLocaleDateString('es-HN', { day: '2-digit', month: 'short', year: 'numeric' })}
+            {item.created_at 
+              ? new Date(item.created_at).toLocaleDateString('es-HN', { day: '2-digit', month: 'short', year: 'numeric' })
+              : 'Fecha no disponible'}
           </Text>
         </View>
         <StatusBadge status={item.status} map={QUOTATION_STATUS_MAP} />
@@ -82,7 +85,7 @@ export default function QuotationsScreen() {
 
       <View style={styles.cardFooter}>
         <Text style={styles.totalLabel}>Total</Text>
-        <Text style={styles.totalValue}>L. {item.total?.toFixed(2)}</Text>
+        <Text style={styles.totalValue}>L. {(item.total ?? 0).toFixed(2)}</Text>
       </View>
 
       {item.valid_until && (
@@ -132,27 +135,27 @@ export default function QuotationsScreen() {
           <ActivityIndicator size="large" color={tokens.colors.primary} />
         </View>
       ) : (
-        <FlashList
-          data={quotations}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => { setRefreshing(true); fetchQuotations(activeTab) }}
-              tintColor={tokens.colors.primary}
-            />
-          }
-          ListEmptyComponent={
-            <EmptyState
-              icon="file-document-outline"
-              title="Sin cotizaciones"
-              subtitle={activeTab === 'all' ? 'Aún no hay cotizaciones.' : `No hay cotizaciones en estado "${TABS.find(t => t.key === activeTab)?.label}".`}
-              action={{ label: 'Nueva cotización', onPress: () => router.push('/quotations/new' as any) }}
-            />
-          }
-        />
+          <FlashList
+            data={quotations}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.list}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => { setRefreshing(true); fetchQuotations(activeTab) }}
+                tintColor={tokens.colors.primary}
+              />
+            }
+            ListEmptyComponent={
+              <EmptyState
+                icon="file-document-outline"
+                title="Sin cotizaciones"
+                subtitle={activeTab === 'all' ? 'Aún no hay cotizaciones.' : `No hay cotizaciones en estado "${TABS.find(t => t.key === activeTab)?.label}".`}
+                action={{ label: 'Nueva cotización', onPress: () => router.push('/quotations/new' as any) }}
+              />
+            }
+          />
       )}
     </SafeAreaView>
   )
