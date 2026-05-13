@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, ActivityIndicator, RefreshControl, Dimensions,
+  TouchableOpacity, ActivityIndicator, RefreshControl, Dimensions, SafeAreaView
 } from 'react-native'
 import Svg, { Rect, Text as SvgText, Line } from 'react-native-svg'
 import { useRouter } from 'expo-router'
@@ -125,14 +125,23 @@ export default function DashboardScreen() {
   const trendPositive = (kpis?.salesTrend ?? 0) >= 0
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={tokens.colors.primary} />
-      }
-    >
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)')} style={styles.backBtn}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Dashboard</Text>
+      </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={tokens.colors.primary} />
+        }
+      >
       {/* ── Hero Sales Card ── */}
       <View style={styles.heroCard}>
         <View style={styles.heroInfo}>
@@ -270,11 +279,24 @@ export default function DashboardScreen() {
 
       <View style={{ height: 24 }} />
     </ScrollView>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: tokens.spacing.md,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.gray100,
+  },
+  backBtn: { padding: 4 },
+  title: { fontSize: tokens.typography.size.xl, fontWeight: '800', color: tokens.colors.gray900, flex: 1, marginLeft: 12 },
+  scroll: { flex: 1 },
   content: { padding: tokens.spacing.md, paddingBottom: tokens.spacing.xl },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: tokens.colors.bgScreen },
 

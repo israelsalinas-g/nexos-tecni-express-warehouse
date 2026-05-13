@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
+import { useRouter } from 'expo-router'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 import { ProductService } from '@/services/product.service'
@@ -7,6 +8,7 @@ import { InventoryService } from '@/services/inventory.service'
 import { tokens } from '@/theme/tokens'
 
 export default function ScanScreen() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [lastScan, setLastScan] = useState<any>(null)
 
@@ -30,7 +32,15 @@ export default function ScanScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Scanner</Text>
+      </View>
+
       <View style={styles.scannerWrapper}>
         <BarcodeScanner onScanned={handleScanned} />
       </View>
@@ -69,13 +79,24 @@ export default function ScanScreen() {
           </View>
         )}
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
-  scannerWrapper: { height: '50%', backgroundColor: '#000' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: tokens.spacing.md,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.gray100,
+  },
+  backBtn: { padding: 4 },
+  title: { fontSize: tokens.typography.size.xl, fontWeight: '800', color: tokens.colors.gray900, flex: 1, marginLeft: 12 },
+  scannerWrapper: { height: '40%', backgroundColor: '#000' },
   resultContainer: { 
     flex: 1, 
     padding: tokens.spacing[4], 

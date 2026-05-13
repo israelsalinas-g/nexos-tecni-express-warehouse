@@ -4,7 +4,8 @@ import {
   TouchableOpacity, Image, Dimensions,
   ActivityIndicator,
   RefreshControl,
-  ImageBackground
+  ImageBackground,
+  SafeAreaView
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -133,14 +134,27 @@ export default function InicioScreen() {
   }
 
   return (
-    <ScrollView 
-      style={styles.container} 
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={tokens.colors.primary} />
-      }
-    >
+    <SafeAreaView style={styles.container}>
+      {/* Navbar with logo */}
+      <View style={styles.navbar}>
+        <Image 
+          source={require('@/assets/site/logo_tecni_express.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <TouchableOpacity style={styles.profileBtn}>
+          <MaterialCommunityIcons name="account-circle-outline" size={28} color={tokens.colors.primary} />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView 
+        style={styles.scroll} 
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={tokens.colors.primary} />
+        }
+      >
       {/* Welcome Hero */}
       <View style={styles.heroWrapper}>
         <ImageBackground
@@ -241,6 +255,7 @@ export default function InicioScreen() {
         <Text style={styles.versionText}>v1.1.0 • Entorno de Producción</Text>
       </View>
     </ScrollView>
+    </SafeAreaView>
   )
 }
 
@@ -248,6 +263,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.bgScreen,
+  },
+  navbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: tokens.spacing.md,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.gray100,
+  },
+  logo: {
+    width: 120,
+    height: 34,
+  },
+  profileBtn: {
+    padding: 4,
+  },
+  scroll: {
+    flex: 1,
   },
   content: {
     padding: tokens.spacing.md,
