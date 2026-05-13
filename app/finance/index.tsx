@@ -16,10 +16,10 @@ interface KPI {
 }
 
 const MODULES = [
-  { id: 'expenses',     title: 'Gastos',              subtitle: 'Egresos operativos', icon: 'receipt-text-outline', color: '#ef4444', route: '/finance/expenses/index' },
-  { id: 'cashflow',     title: 'Flujo de Caja',       subtitle: 'Ingresos vs Egresos', icon: 'trending-up', color: '#3b82f6', route: '/finance/cashflow/index' },
-  { id: 'balance',      title: 'Balance',             subtitle: 'Utilidad neta',      icon: 'scale-balance', color: '#10b981', route: '/finance/balance/index' },
-  { id: 'reports',      title: 'Reportes',            subtitle: 'Análisis detallado', icon: 'chart-bar', color: '#8b5cf6', route: '/reports/index' },
+  { id: 'expenses',     title: 'Gastos',              subtitle: 'Egresos operativos', icon: 'receipt-text-outline', color: '#ef4444', route: '/finance/expenses' },
+  { id: 'cashflow',     title: 'Flujo de Caja',       subtitle: 'Ingresos vs Egresos', icon: 'trending-up', color: '#3b82f6', route: '/finance/cashflow' },
+  { id: 'balance',      title: 'Balance',             subtitle: 'Utilidad neta',      icon: 'scale-balance', color: '#10b981', route: '/finance/balance' },
+  { id: 'reports',      title: 'Reportes',            subtitle: 'Análisis detallado', icon: 'chart-bar', color: '#8b5cf6', route: '/reports' },
 ]
 
 export default function FinanceScreen() {

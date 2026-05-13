@@ -96,7 +96,7 @@ export default function InicioScreen() {
       subtitle: 'Balance y gastos',
       icon: 'bank-outline',
       color: '#10b981',
-      route: '/finance/index'
+      route: '/finance'
     },
     {
       id: 'movements',
