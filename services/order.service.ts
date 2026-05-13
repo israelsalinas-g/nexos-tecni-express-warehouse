@@ -3,18 +3,21 @@ import { Order, OrderItem } from '@/types/database.types'
 
 export class OrderService {
   /**
-   * Fetches pending orders for the warehouse
+   * Fetches orders with optional status filter
    */
-  static async getPendingOrders(warehouseId?: string) {
+  static async getOrders(status?: Order['status'], warehouseId?: string) {
     let query = supabase
       .from('orders')
       .select(`
         *,
-        profiles(full_name, phone),
+        profiles!customer_id(full_name, phone),
         order_items(product_name_es, product_sku, quantity, unit_price, subtotal)
       `)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: false })
+
+    if (status) {
+      query = query.eq('status', status)
+    }
 
     if (warehouseId) {
       query = query.eq('warehouse_id', warehouseId)
@@ -23,6 +26,13 @@ export class OrderService {
     const { data, error } = await query
     if (error) throw error
     return data || []
+  }
+
+  /**
+   * Fetches pending orders for the warehouse
+   */
+  static async getPendingOrders(warehouseId?: string) {
+    return this.getOrders('pending', warehouseId)
   }
 
   /**

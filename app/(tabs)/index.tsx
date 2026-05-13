@@ -51,6 +51,14 @@ export default function InicioScreen() {
 
   const menuItems = [
     {
+      id: 'orders',
+      title: 'Pedidos',
+      subtitle: 'Órdenes web',
+      icon: 'cart-check',
+      color: '#8b5cf6', // Violet
+      route: '/orders'
+    },
+    {
       id: 'sales',
       title: 'Ventas',
       subtitle: 'Facturación y POS',
@@ -112,7 +120,7 @@ export default function InicioScreen() {
       subtitle: 'Análisis y métricas',
       icon: 'chart-bar',
       color: '#3b82f6',
-      route: '/reports/index'
+      route: '/reports'
     },
     {
       id: 'settings',
