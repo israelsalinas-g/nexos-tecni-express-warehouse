@@ -91,6 +91,14 @@ export default function InicioScreen() {
       route: '/(tabs)/auxiliaries'
     },
     {
+      id: 'finance',
+      title: 'Finanzas',
+      subtitle: 'Balance y gastos',
+      icon: 'bank-outline',
+      color: '#10b981',
+      route: '/finance/index'
+    },
+    {
       id: 'movements',
       title: 'Movimientos',
       subtitle: 'Compras y Traslados',
