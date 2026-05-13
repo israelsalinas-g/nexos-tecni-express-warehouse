@@ -17,9 +17,9 @@ interface KPI {
 
 const MODULES = [
   { id: 'expenses',     title: 'Gastos',              subtitle: 'Egresos operativos', icon: 'receipt-text-outline', color: '#ef4444', route: '/finance/expenses/index' },
-  { id: 'receivables',  title: 'Cuentas x Cobrar',   subtitle: 'Deudas de clientes', icon: 'account-arrow-right-outline', color: '#3b82f6', route: '/finance/receivables/index' },
-  { id: 'payables',     title: 'Cuentas x Pagar',    subtitle: 'Deudas a proveedores', icon: 'account-arrow-left-outline', color: '#f59e0b', route: '/finance/payables/index' },
-  { id: 'balance',      title: 'Balance',             subtitle: 'Flujo de caja', icon: 'chart-line', color: '#10b981', route: '/finance/balance/index' },
+  { id: 'cashflow',     title: 'Flujo de Caja',       subtitle: 'Ingresos vs Egresos', icon: 'trending-up', color: '#3b82f6', route: '/finance/cashflow/index' },
+  { id: 'balance',      title: 'Balance',             subtitle: 'Utilidad neta',      icon: 'scale-balance', color: '#10b981', route: '/finance/balance/index' },
+  { id: 'reports',      title: 'Reportes',            subtitle: 'Análisis detallado', icon: 'chart-bar', color: '#8b5cf6', route: '/reports/index' },
 ]
 
 export default function FinanceScreen() {

@@ -7,17 +7,33 @@ import { useRouter } from 'expo-router'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { BalanceService, MonthlyCashflow } from '@/services/balance.service'
-import { CashflowChart } from '@/components/finance/CashflowChart'
 import { tokens } from '@/theme/tokens'
 
 type Period = 'today' | 'week' | 'month' | 'quarter'
 
 const PERIODS: { key: Period; label: string }[] = [
   { key: 'today',   label: 'Hoy' },
-  { key: 'week',    label: 'Esta Semana' },
-  { key: 'month',   label: 'Este Mes' },
+  { key: 'week',    label: 'Semana' },
+  { key: 'month',   label: 'Mes' },
   { key: 'quarter', label: 'Trimestre' },
 ]
+
+function BalanceRow({ label, value, bold = false, indent = false, color }: {
+  label: string
+  value: number
+  bold?: boolean
+  indent?: boolean
+  color?: string
+}) {
+  return (
+    <View style={[styles.balanceRow, indent && styles.balanceRowIndent]}>
+      <Text style={[styles.rowLabel, bold && styles.rowLabelBold]}>{label}</Text>
+      <Text style={[styles.rowValue, bold && styles.rowValueBold, color ? { color } : null]}>
+        L. {value.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      </Text>
+    </View>
+  )
+}
 
 export default function BalanceScreen() {
   const router = useRouter()
@@ -41,10 +57,7 @@ export default function BalanceScreen() {
 
   useEffect(() => { fetchData(period) }, [period, fetchData])
 
-  const fmt = (n: number) =>
-    `L. ${n.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-
-  const netPositive = (cashflow?.net ?? 0) >= 0
+  const grossProfit = (cashflow?.income ?? 0) - (cashflow?.expenses ?? 0)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -52,11 +65,10 @@ export default function BalanceScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.headerBack}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={tokens.colors.gray900} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Balance / Cashflow</Text>
+        <Text style={styles.headerTitle}>Balance del Período</Text>
       </View>
 
-      {/* Period tabs */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsContainer} contentContainerStyle={styles.tabs}>
         {PERIODS.map(p => (
           <TouchableOpacity
             key={p.key}
@@ -78,86 +90,33 @@ export default function BalanceScreen() {
         {loading && !refreshing ? (
           <View style={styles.centered}><ActivityIndicator size="large" color={tokens.colors.primary} /></View>
         ) : cashflow ? (
-          <>
-            {/* KPI cards */}
-            <View style={styles.kpiRow}>
-              <View style={[styles.kpiCard, { borderLeftColor: '#10b981' }]}>
-                <Text style={styles.kpiLabel}>Ingresos</Text>
-                <Text style={[styles.kpiValue, { color: '#10b981' }]}>{fmt(cashflow.income)}</Text>
-              </View>
-              <View style={[styles.kpiCard, { borderLeftColor: '#ef4444' }]}>
-                <Text style={styles.kpiLabel}>Gastos</Text>
-                <Text style={[styles.kpiValue, { color: '#ef4444' }]}>{fmt(cashflow.expenses)}</Text>
-              </View>
-            </View>
+          <View style={styles.reportCard}>
+            <Text style={styles.sectionTitle}>INGRESOS DEL PERÍODO</Text>
+            <BalanceRow label="Ventas cobradas" value={cashflow.income} indent />
+            <View style={styles.separator} />
+            <BalanceRow label="Total ingresos" value={cashflow.income} bold />
 
-            {/* Net balance hero */}
-            <View style={[styles.netCard, { backgroundColor: netPositive ? '#10b98110' : '#ef444410' }]}>
-              <Text style={styles.netLabel}>Balance Neto</Text>
-              <Text style={[styles.netValue, { color: netPositive ? '#10b981' : '#ef4444' }]}>
-                {netPositive ? '+' : ''}{fmt(cashflow.net)}
+            <View style={{ height: 32 }} />
+
+            <Text style={styles.sectionTitle}>EGRESOS DEL PERÍODO</Text>
+            <BalanceRow label="Gastos operativos" value={cashflow.expenses} indent />
+            <View style={styles.separator} />
+            <BalanceRow label="Total egresos" value={cashflow.expenses} bold />
+
+            <View style={{ height: 40 }} />
+
+            <View style={[styles.resultBox, { borderTopColor: grossProfit >= 0 ? '#10b981' : '#ef4444' }]}>
+              <Text style={styles.resultLabel}>Utilidad bruta</Text>
+              <Text style={[styles.resultValue, { color: grossProfit >= 0 ? '#10b981' : '#ef4444' }]}>
+                {grossProfit < 0 ? '-' : ''} L. {Math.abs(grossProfit).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Text>
-              <View style={styles.netIndicator}>
-                <MaterialCommunityIcons
-                  name={netPositive ? 'trending-up' : 'trending-down'}
-                  size={18}
-                  color={netPositive ? '#10b981' : '#ef4444'}
-                />
-                <Text style={[styles.netIndicatorText, { color: netPositive ? '#10b981' : '#ef4444' }]}>
-                  {netPositive ? 'Flujo positivo' : 'Flujo negativo'}
-                </Text>
-              </View>
             </View>
 
-            {/* Weekly chart */}
-            {cashflow.weekly.length > 0 ? (
-              <View style={styles.chartCard}>
-                <Text style={styles.chartTitle}>Ingresos vs Gastos por Semana</Text>
-                <CashflowChart data={cashflow.weekly} height={160} />
-
-                {/* Weekly table */}
-                <View style={styles.weekTable}>
-                  {cashflow.weekly.map(w => (
-                    <View key={w.week} style={styles.weekRow}>
-                      <Text style={styles.weekLabel}>{w.week}</Text>
-                      <Text style={styles.weekDateRange}>{w.label}</Text>
-                      <Text style={[styles.weekIncome]}>+{fmt(w.income)}</Text>
-                      <Text style={[styles.weekExpense]}>-{fmt(w.expenses)}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            ) : (
-              <View style={styles.noData}>
-                <MaterialCommunityIcons name="chart-line" size={48} color={tokens.colors.gray200} />
-                <Text style={styles.noDataText}>Sin movimientos en este período</Text>
-              </View>
+            {grossProfit < 0 && (
+              <Text style={styles.negativeAlert}>Los egresos superaron los ingresos en este período</Text>
             )}
-
-            {/* Margin indicator */}
-            {cashflow.income > 0 && (
-              <View style={styles.marginCard}>
-                <Text style={styles.marginLabel}>Margen Bruto</Text>
-                <Text style={[styles.marginValue, { color: netPositive ? '#10b981' : '#ef4444' }]}>
-                  {((cashflow.net / cashflow.income) * 100).toFixed(1)}%
-                </Text>
-                <View style={styles.marginBar}>
-                  <View
-                    style={[
-                      styles.marginFill,
-                      {
-                        width: `${Math.max(0, Math.min(100, (cashflow.net / cashflow.income) * 100))}%` as any,
-                        backgroundColor: netPositive ? '#10b981' : '#ef4444',
-                      },
-                    ]}
-                  />
-                </View>
-              </View>
-            )}
-          </>
+          </View>
         ) : null}
-
-        <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
   )
@@ -166,7 +125,6 @@ export default function BalanceScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bgScreen },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', height: 200 },
-
   header: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: tokens.spacing.md, paddingVertical: 12,
@@ -176,10 +134,10 @@ const styles = StyleSheet.create({
   },
   headerBack: { padding: 4 },
   headerTitle: { fontSize: tokens.typography.size.xl, fontWeight: '800', color: tokens.colors.gray900 },
-
-  tabs: { paddingHorizontal: tokens.spacing.md, paddingVertical: tokens.spacing.sm, gap: tokens.spacing.sm },
+  tabsContainer: { flexGrow: 0, maxHeight: 50 },
+  tabs: { paddingHorizontal: tokens.spacing.md, paddingVertical: tokens.spacing.xs, gap: tokens.spacing.xs, alignItems: 'center' },
   tab: {
-    paddingHorizontal: tokens.spacing.md, paddingVertical: 7,
+    paddingHorizontal: tokens.spacing.md, paddingVertical: 6,
     borderRadius: tokens.radius.full,
     borderWidth: 1.5, borderColor: tokens.colors.gray200,
     backgroundColor: tokens.colors.bgLight,
@@ -187,59 +145,22 @@ const styles = StyleSheet.create({
   tabActive: { backgroundColor: '#10b981', borderColor: '#10b981' },
   tabText: { fontSize: tokens.typography.size.sm, fontWeight: '600', color: tokens.colors.gray600 },
   tabTextActive: { color: '#fff' },
-
   content: { padding: tokens.spacing.md },
-
-  kpiRow: { flexDirection: 'row', gap: tokens.spacing.sm, marginBottom: tokens.spacing.sm },
-  kpiCard: {
-    flex: 1, backgroundColor: tokens.colors.bgLight,
-    borderRadius: tokens.radius.xl, padding: tokens.spacing.md,
-    borderLeftWidth: 4,
-    ...tokens.shadow.sm,
-  },
-  kpiLabel: { fontSize: tokens.typography.size.xs, color: tokens.colors.gray600, fontWeight: '600' },
-  kpiValue: { fontSize: tokens.typography.size.lg, fontWeight: '800', marginTop: 4 },
-
-  netCard: {
+  reportCard: {
+    backgroundColor: tokens.colors.bgLight,
     borderRadius: tokens.radius.xl, padding: tokens.spacing.lg,
-    alignItems: 'center', marginBottom: tokens.spacing.md,
-    borderWidth: 1, borderColor: 'transparent',
+    ...tokens.shadow.md,
   },
-  netLabel: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray600, fontWeight: '600' },
-  netValue: { fontSize: 28, fontWeight: '800', marginVertical: 4 },
-  netIndicator: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  netIndicatorText: { fontSize: tokens.typography.size.sm, fontWeight: '600' },
-
-  chartCard: {
-    backgroundColor: tokens.colors.bgLight,
-    borderRadius: tokens.radius.xl, padding: tokens.spacing.md,
-    marginBottom: tokens.spacing.md,
-    ...tokens.shadow.sm,
-  },
-  chartTitle: { fontSize: tokens.typography.size.sm, fontWeight: '700', color: tokens.colors.gray800, marginBottom: tokens.spacing.sm },
-
-  weekTable: { marginTop: tokens.spacing.sm },
-  weekRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 8,
-    borderTopWidth: 1, borderTopColor: tokens.colors.gray100,
-    gap: tokens.spacing.sm,
-  },
-  weekLabel: { width: 50, fontSize: tokens.typography.size.xs, fontWeight: '700', color: tokens.colors.gray800 },
-  weekDateRange: { flex: 1, fontSize: 10, color: tokens.colors.gray400 },
-  weekIncome: { fontSize: tokens.typography.size.xs, fontWeight: '700', color: '#10b981', width: 80, textAlign: 'right' },
-  weekExpense: { fontSize: tokens.typography.size.xs, fontWeight: '700', color: '#ef4444', width: 80, textAlign: 'right' },
-
-  noData: { alignItems: 'center', paddingVertical: 40 },
-  noDataText: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray400, marginTop: 8 },
-
-  marginCard: {
-    backgroundColor: tokens.colors.bgLight,
-    borderRadius: tokens.radius.xl, padding: tokens.spacing.md,
-    ...tokens.shadow.sm,
-  },
-  marginLabel: { fontSize: tokens.typography.size.sm, fontWeight: '600', color: tokens.colors.gray600, marginBottom: 4 },
-  marginValue: { fontSize: tokens.typography.size.xl, fontWeight: '800', marginBottom: 8 },
-  marginBar: { height: 8, backgroundColor: tokens.colors.gray100, borderRadius: 4 },
-  marginFill: { height: 8, borderRadius: 4 },
+  sectionTitle: { fontSize: 10, fontWeight: '800', color: tokens.colors.gray400, letterSpacing: 1.2, marginBottom: 8 },
+  balanceRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
+  balanceRowIndent: { paddingLeft: 16 },
+  rowLabel: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray600 },
+  rowLabelBold: { fontWeight: '700', color: tokens.colors.gray900 },
+  rowValue: { fontSize: tokens.typography.size.sm, color: tokens.colors.gray900, fontFamily: 'monospace' },
+  rowValueBold: { fontWeight: '800' },
+  separator: { height: 1, backgroundColor: tokens.colors.gray100, marginVertical: 4 },
+  resultBox: { borderTopWidth: 2, paddingTop: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  resultLabel: { fontSize: tokens.typography.size.base, fontWeight: '800', color: tokens.colors.gray900 },
+  resultValue: { fontSize: tokens.typography.size.lg, fontWeight: '900' },
+  negativeAlert: { fontSize: 11, color: '#ef4444', textAlign: 'center', marginTop: 12, fontWeight: '500' },
 })
