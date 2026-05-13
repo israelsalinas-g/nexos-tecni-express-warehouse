@@ -44,6 +44,13 @@ export default function AuxiliariesScreen() {
       icon: 'warehouse',
       color: '#ef4444', // Red
       route: '/auxiliaries/warehouses'
+    },
+    {
+      id: 'carriers',
+      title: 'Transportistas',
+      icon: 'truck-delivery-outline',
+      color: '#3b82f6', // Blue
+      route: '/auxiliaries/carriers'
     }
   ]
 

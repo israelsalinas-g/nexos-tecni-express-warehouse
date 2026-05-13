@@ -301,6 +301,17 @@ export interface QuotationItem {
   products?: Product
 }
 
+export interface Carrier {
+  id: string
+  name: string
+  phone?: string | null
+  email?: string | null
+  tracking_url_template?: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 // ─── Shipments ───────────────────────────────────────────────────────────────
 
 export type ShipmentStatus = 'pending' | 'dispatched' | 'in_transit' | 'delivered' | 'returned'
