@@ -59,12 +59,28 @@ export default function InicioScreen() {
       route: '/orders'
     },
     {
+      id: 'quotations',
+      title: 'Cotizaciones',
+      subtitle: 'Presupuestos',
+      icon: 'file-document-outline',
+      color: '#0ea5e9',
+      route: '/(tabs)/quotations'
+    },
+    {
       id: 'sales',
       title: 'Ventas',
       subtitle: 'Facturación y POS',
       icon: 'cash-register',
       color: tokens.colors.primary,
       route: '/(tabs)/sales'
+    },
+{
+      id: 'shipments',
+      title: 'Envíos',
+      subtitle: 'Logística',
+      icon: 'truck-fast-outline',
+      color: '#f59e0b',
+      route: '/(tabs)/shipments'
     },
     {
       id: 'inventory',
@@ -75,20 +91,12 @@ export default function InicioScreen() {
       route: '/(tabs)/inventory'
     },
     {
-      id: 'quotations',
-      title: 'Cotizaciones',
-      subtitle: 'Presupuestos',
-      icon: 'file-document-outline',
-      color: '#0ea5e9',
-      route: '/(tabs)/quotations'
-    },
-    {
-      id: 'shipments',
-      title: 'Envíos',
-      subtitle: 'Logística',
-      icon: 'truck-fast-outline',
-      color: '#f59e0b',
-      route: '/(tabs)/shipments'
+      id: 'movements',
+      title: 'Movimientos',
+      subtitle: 'Compras y Traslados',
+      icon: 'swap-horizontal-bold',
+      color: tokens.colors.onSurfaceVariant,
+      route: '/(tabs)/movements'
     },
     {
       id: 'auxiliaries',
@@ -105,22 +113,6 @@ export default function InicioScreen() {
       icon: 'bank-outline',
       color: '#10b981',
       route: '/finance'
-    },
-    {
-      id: 'movements',
-      title: 'Movimientos',
-      subtitle: 'Compras y Traslados',
-      icon: 'swap-horizontal-bold',
-      color: tokens.colors.onSurfaceVariant,
-      route: '/(tabs)/movements'
-    },
-    {
-      id: 'reports',
-      title: 'Reportes',
-      subtitle: 'Análisis y métricas',
-      icon: 'chart-bar',
-      color: '#3b82f6',
-      route: '/reports'
     },
     {
       id: 'settings',
